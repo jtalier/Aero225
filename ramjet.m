@@ -70,7 +70,7 @@ B
 %}
 
 % OS 1
-numShocks = 14;
+numShocks = 3;
 M = zeros(1,numShocks+1);
 
 p = zeros(1,numShocks+1);
@@ -86,18 +86,16 @@ M(1) = M1;
 B = zeros(1,numShocks);
 %theta = zeros(1,numShocks);
 
-theta = 4;     % deg
-starting_guess = 60;
+theta = 13;     % deg
+starting_guess = 30;
 
 for i = 1:numShocks
+    %{
     if i == 12
         theta = 2
         starting_guess = 60;
     end
-    if i == 14
-        theta = 1
-        starting_guess = 60;
-    end
+    %}
     
     B(i) = fzero(@(B) tand(theta) - 2*cotd(B)* ...
         (M(i)^2*(sind(B))^2 - 1) / (M(i)^2*(gamma + cosd(2*B)) + 2), starting_guess);
@@ -133,7 +131,7 @@ M2 = downstream_mach;
 T2 = Trat*T(end);  p2 = prat*p(end);   rho2 = rhorat*rho(end);
 
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M2);
-T02 = T(end)/Trat;      p02 = p(end)/prat;
+T02 = T2/Trat;      p02 = p2/prat;
     
 p02/p01
 
