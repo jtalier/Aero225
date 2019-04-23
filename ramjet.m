@@ -55,3 +55,5 @@ theta = 20;     % deg
 
 fzero(@(B) tand(theta) - 2*cotd(B)* ...
     (M1^2*(sind(B))^2 - 1) / (M1^2*(gamma + cosd(2*B)) + 2), 20)
+
+
