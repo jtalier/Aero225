@@ -181,15 +181,9 @@ hit4_x = (h1+sind(B(4))*hit3_x) / (sind(theta) + sind(B(4)));
 
 figure(2);
 hold on;
-% lower wall
+plot(x,h1*ones(1,length(x)),'k');           % upper wall
 x = 0:0.01:hit4_x;
-plot(x,x*sind(theta),'k');  
-
-% upper wall
-x = hit1_x:0.01:13;
-plot(x,h1*ones(1,length(x)),'k');           
-
-
+plot(x,x*sind(theta),'k');  % lower wall
 % first shock
 x = 0:0.01:hit1_x;
 shock1_y = x*sind(B(1));
@@ -212,7 +206,7 @@ plot(x,shock4_y);
 
 % end of lower wall
 x = hit4_x:0.01:13;
-plot(x,(sind(theta)*hit4_x)*ones(1,length(x)),'k');
+plot(x,hit4_y);
 
 
 axis([0 13 0 4]);
