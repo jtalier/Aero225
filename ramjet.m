@@ -202,9 +202,19 @@ axis([0 13 0 4]);
 
 h3 = h1 - (sind(theta)*hit4_x);
 
-%% DIFFUSOR
-A4 = A1;
-rho3*M3*sqrt(gamma*T3*R)*w*h3
+%% DIFFUSER
+A3 = ; %Starting aera of diffuser
+h3 = A3/w; %Starting Diffuser Height
+A4 = A1; %End area of diffuser
+h4 = A4/w; %Diffuser Height
+
+%Find A*
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
+a_star = arearat/A3; 
+
+L_diff = 1; %[meters] %Length of diffuser
+L = linspace(0,L);
+h = (h4-h3/L_diff)*L + h3;
 
 
 
