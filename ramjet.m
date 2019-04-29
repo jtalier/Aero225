@@ -126,6 +126,7 @@ end
 
 [mach, Trat, prat, rhorat, downstream_mach, p0rat] = ...
     flownormalshock(gamma, M(end));
+
 %% State 3
 M3 = downstream_mach;
 T3 = Trat*T(end);  p3 = prat*p(end);   rho3 = rhorat*rho(end);
@@ -327,6 +328,7 @@ for i = 2:length(Aratios)
     rho(i) = rho03*rhorat;
 end
 
+%% State 4
 M4 = M(end);
 T4 = T(end);
 p4 = p(end);
@@ -335,6 +337,10 @@ T04 = T03;
 p04 = p03;
 u = sqrt(gamma.*T.*R).*M;
 u4 = u(end);
+a4 = sqrt(gamma*R*T4);
+h4 = cp*T4;
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M4);
+T04 = T4/Trat;     p04 = p4/prat;   rho04 = rho4/rhorat;
 
 %massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
 %massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
@@ -411,4 +417,33 @@ grid on;
 xlabel('Length along Engine [m]');
 ylabel('Flow Speed [m/s]');
 ylim([0, max(uVecByLength) * 1.1]);
+
+
+%% Enthalpy and Entropy
+hVecByLength = cp.*TVecByLength;
+delta_s_RVecByLength = (gamma/(gamma-1)).*log(TVecByLength./T1) - ...
+    log(pVecByLength./p1);
+
+figure();
+hold on;
+plot(delta_s_RVecByLength, hVecByLength ./ h1, '-k', 0, 1, 'ob');
+title('Mollier Diagram');
+xlabel('Change in Entropy / R [unitless]');
+ylabel('Enthalpy normalized by initial state [unitless]');
+grid on;
+
+% Adding states
+plot((gamma/(gamma-1)).*log(T3/T1) - log(p3/p1), h3/h1, 'o');
+plot((gamma/(gamma-1)).*log(T4/T1) - log(p4/p1), h4/h1, 'o');
+
+% Making plot look nice and adding legend
+ax = gca;
+xDist = ax.XLim(2) - ax.XLim(1);
+ax.XLim(1) = ax.XLim(1) - xDist/4;
+ax.XLim(2) = ax.XLim(2) + xDist/4;
+yDist = ax.YLim(2) - ax.YLim(1);
+ax.YLim(1) = ax.YLim(1) - yDist/4;
+ax.YLim(2) = ax.YLim(2) + yDist/4;
+ax.YLim(1) = 0;
+legend('Process', 'State 1', 'State 3', 'State 4');
 
