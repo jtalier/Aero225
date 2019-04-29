@@ -208,9 +208,43 @@ A3 = height3*w;
 
 
 
-%% DIFFUSOR
-A4 = A1;
-rho3*M3*sqrt(gamma*T3*R)*A3
+%% DIFFUSER
+A3 = A3; %Starting aera of diffuser
+h3 = A3/w; %Starting Diffuser Height
+A4 = A1; %End area of diffuser
+h4 = A4/w; %Diffuser Height
 
+%Find A*
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
+a_star = arearat/A3;
 
+numPoints = 100;
+L_diff = 0.5; %[meters] %Length of diffuser
+L = linspace(0,L_diff,100);
+Aratios = w.*((h4-h3/L_diff)*L + h3)./a_star;
 
+%Initialize Variables
+M = zeros(1,numPoints+1);
+M(1) = M3;
+p = zeros(1,numPoints+1);
+p(1) = p3;
+p0 = zeros(1,numPoints+1);
+p0(1) = p03;
+T = zeros(1,numPoints+1);
+T(1) = T3;
+rho = zeros(1,numPoints+1);
+rho(1) = rho3;
+
+for i = 1:length(Aratios) 
+    M(i+1) = fzero(@(M) (1/M)*((2/(gamma+1))*(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i),0.5);
+    
+    [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i));
+    p(i+1) = p(i)*prat;
+    rho(i+1) = rho(i)*rhorat;
+    T(i+1) = T(i)*Trat;
+    p0(i+1) = p(i+1)/prat;
+end
+mach = M(end)
+
+massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
+massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
