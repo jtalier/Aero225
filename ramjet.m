@@ -104,7 +104,7 @@ end
 B
 M
 %p0(end)/p0(1)
-    
+
 
 [mach, Trat, prat, rhorat, downstream_mach, p0rat] = ...
     flownormalshock(gamma, M(end));
@@ -123,84 +123,85 @@ p03/p01
 
 %% Inlet Geometry
 x = 0:0.01:13;
-lower_wall_y = x*sind(theta);
-shock1_y = x*sind(B(1));
+lower_wall_y = x*tand(theta);
+shock1_y = x*tand(B(1));
 
 plot(x,lower_wall_y,'k',x,h1*ones(1,length(x)),'k',x,shock1_y);
 hold on;
 %x*sind(B(1)) = h
-hit1_x = h1 / sind(B(1));
-% shock 2 m = -sind(B(2))
+hit1_x = h1 / tand(B(1));
+% shock 2 m = -tand(B(2)-theta)
 % shock 2 point : hit1_x, h
-% y - h = -sind(B(2))*(x-hit1_x)
-shock2_y = h1 -sind(B(2))*(x - hit1_x);
+% y - h = -tand(B(2)-theta)*(x-hit1_x)
+shock2_y = h1 - tand(B(2)-theta)*(x - hit1_x);
 plot(x,shock2_y);
 
-% shock2_y = hit2_y = sind(theta)*hit2_x = h1 -sind(B(2))*(hit2_x - hit1_x)
-hit2_x = (h1+sind(B(2))*hit1_x) / (sind(theta) + sind(B(2)));
+% shock2_y = hit2_y = tand(theta)*hit2_x = h1 -tand(B(2)-theta)*(hit2_x - hit1_x)
+hit2_x = (h1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
 
 % shock 3 m = sind(B(3))
 % shock 3 point : hit2_x, sind(theta)*hit2_x
 % y - sind(theta)*hit2_x = sind(B(3))*(x-hit2_x)
-shock3_y = sind(theta)*hit2_x +sind(B(3))*(x - hit2_x);
+shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
 
 plot(x,shock3_y);
 
 
 % shock3_y = hit3_y = h1 = sind(theta)*hit2_x +sind(B(3))*(x - hit2_x)
-hit3_x = (h1-sind(theta)*hit2_x + sind(B(3))*hit2_x) / ...
-    (sind(B(3)));
+hit3_x = (h1-tand(theta)*hit2_x + tand(B(3))*hit2_x) / ...
+    (tand(B(3)));
 
-% shock 4 m = -sind(B(4))
+% shock 4 m = -sind(B(4)-theta)
 % shock 4 point : hit3_x, h1
-% y - h1 = -sind(B(4))*(x-hit3_x)
-shock4_y = h1 -sind(B(4))*(x-hit3_x);
+% y - h1 = -sind(B(4)-theta)*(x-hit3_x)
+shock4_y = h1 -tand(B(4)-theta)*(x-hit3_x);
 
 plot(x,shock4_y);
 
 % shock4_y = hit4_y = sind(theta)*hit4_x = h1 -sind(B(4))*(hit4_x-hit3_x);
-hit4_x = (h1+sind(B(4))*hit3_x) / (sind(theta) + sind(B(4)));
+hit4_x = (h1+tand(B(4)-theta)*hit3_x) / (tand(theta) + tand(B(4)-theta));
 
 figure(2);
 hold on;
 % lower wall
 x = 0:0.01:hit4_x;
-plot(x,x*sind(theta),'k');  
+plot(x,x*tand(theta),'k');  
 
 % upper wall
 x = hit1_x:0.01:13;
 plot(x,h1*ones(1,length(x)),'k');           
 
-
 % first shock
 x = 0:0.01:hit1_x;
-shock1_y = x*sind(B(1));
+shock1_y = x*tand(B(1));
 plot(x,shock1_y); 
 
 % second shock
 x = hit1_x:0.01:hit2_x;
-shock2_y = h1 -sind(B(2))*(x - hit1_x);
+shock2_y = h1 -tand(B(2)-theta)*(x - hit1_x);
 plot(x,shock2_y);
 
 % third shock
 x = hit2_x:0.01:hit3_x;
-shock3_y = sind(theta)*hit2_x +sind(B(3))*(x - hit2_x);
+shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
 plot(x,shock3_y);
 
 % fourth shock
 x = hit3_x:0.01:hit4_x;
-shock4_y = h1 -sind(B(4))*(x-hit3_x);
+shock4_y = h1 -tand(B(4)-theta)*(x-hit3_x);
 plot(x,shock4_y);
 
 % end of lower wall
 x = hit4_x:0.01:13;
-plot(x,(sind(theta)*hit4_x)*ones(1,length(x)),'k');
+plot(x,(tand(theta)*hit4_x)*ones(1,length(x)),'k');
 
 
 axis([0 13 0 4]);
+axis equal;
 
 
-h3 = h1 - (sind(theta)*hit4_x);
+h3 = h1 - (tand(theta)*hit4_x);
+A3 = h3*w;
 
 %% DIFFUSER
 A3 = ; %Starting aera of diffuser
