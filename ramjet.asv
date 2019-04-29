@@ -47,7 +47,9 @@ a1 = sqrt(gamma*R*T1);
 T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
 u1 = M1*a1;
 A1 = m_dot / rho1 / u1;
-h1 = A1 / w;
+h1 = cp*T1;
+height1 = A1 / w;
+
 
 
 %% Inlet
@@ -116,6 +118,7 @@ T3 = Trat*T(end);  p3 = prat*p(end);   rho3 = rhorat*rho(end);
 T03 = T3/Trat;     p03 = p3/prat;   rho03 = rho3/rhorat;
 a3 = sqrt(gamma*R*T3);
 u3 = M3*a3;
+h3 = cp*T3;
 
 p03/p01
 
@@ -126,18 +129,18 @@ x = 0:0.01:13;
 lower_wall_y = x*tand(theta);
 shock1_y = x*tand(B(1));
 
-plot(x,lower_wall_y,'k',x,h1*ones(1,length(x)),'k',x,shock1_y);
+plot(x,lower_wall_y,'k',x,height1*ones(1,length(x)),'k',x,shock1_y);
 hold on;
 %x*sind(B(1)) = h
-hit1_x = h1 / tand(B(1));
+hit1_x = height1 / tand(B(1));
 % shock 2 m = -tand(B(2)-theta)
 % shock 2 point : hit1_x, h
 % y - h = -tand(B(2)-theta)*(x-hit1_x)
-shock2_y = h1 - tand(B(2)-theta)*(x - hit1_x);
+shock2_y = height1 - tand(B(2)-theta)*(x - hit1_x);
 plot(x,shock2_y);
 
 % shock2_y = hit2_y = tand(theta)*hit2_x = h1 -tand(B(2)-theta)*(hit2_x - hit1_x)
-hit2_x = (h1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
+hit2_x = (height1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
 
 % shock 3 m = sind(B(3))
 % shock 3 point : hit2_x, sind(theta)*hit2_x
@@ -169,7 +172,7 @@ plot(x,x*tand(theta),'k');
 
 % upper wall
 x = hit1_x:0.01:13;
-plot(x,h1*ones(1,length(x)),'k');           
+plot(x,height1*ones(1,length(x)),'k');           
 
 % first shock
 x = 0:0.01:hit1_x;
@@ -178,7 +181,7 @@ plot(x,shock1_y);
 
 % second shock
 x = hit1_x:0.01:hit2_x;
-shock2_y = h1 -tand(B(2)-theta)*(x - hit1_x);
+shock2_y = height1 -tand(B(2)-theta)*(x - hit1_x);
 plot(x,shock2_y);
 
 % third shock
@@ -188,7 +191,7 @@ plot(x,shock3_y);
 
 % fourth shock
 x = hit3_x:0.01:hit4_x;
-shock4_y = h1 -tand(B(4)-theta)*(x-hit3_x);
+shock4_y = height1 -tand(B(4)-theta)*(x-hit3_x);
 plot(x,shock4_y);
 
 % end of lower wall
@@ -200,14 +203,49 @@ axis([0 13 0 4]);
 axis equal;
 
 
-height3 = h1 - (tand(theta)*hit4_x);
-A3 = h3*w;
+height3 = height1 - (tand(theta)*hit4_x);
+A3 = height3*w;
 
 
 
-%% DIFFUSOR
-A4 = A1;
-rho3*M3*sqrt(gamma*T3*R)*A3
+%% DIFFUSER
+A3 = A3; %Starting aera of diffuser
+h3 = A3/w; %Starting Diffuser Height
+A4 = A1; %End area of diffuser
+height4 = A4/w; %Diffuser Height
 
+%Find A*
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
+a_star = arearat/A3;
 
+numPoints = 100;
+L_diff = 0.5; %[meters] %Length of diffuser
+L = linspace(0,L_diff,100);
+Aratios = w.*((height4-h3/L_diff)*L + h3)./a_star;
 
+%Initialize Variables
+M = zeros(1,numPoints+1);
+M(1) = M3;
+p = zeros(1,numPoints+1);
+p(1) = p3;
+p0 = zeros(1,numPoints+1);
+p0(1) = p03;
+T = zeros(1,numPoints+1);
+T(1) = T3;
+rho = zeros(1,numPoints+1);
+rho(1) = rho3;
+
+for i = 1:length(Aratios) 
+    M(i+1) = fzero(@(M) (1/M)*((2/(gamma+1)) ...
+        *(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i), 0.5);
+    
+    [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i));
+    p(i+1) = p(i)*prat;
+    rho(i+1) = rho(i)*rhorat;
+    T(i+1) = T(i)*Trat;
+    p0(i+1) = p(i+1)/prat;
+end
+mach = M(end)
+
+massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
+massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
