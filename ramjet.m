@@ -219,18 +219,19 @@ L = linspace(0,L_diff,100);
 Aratios = w.*((h4-h3/L_diff)*L + h3)./a_star;
 
 %Initialize Variables
-M = zeros(1,numPoints);
-p = zeros(1,numPoints);
+M = zeros(1,numPoints+1);
+M(1) = M3;
+p = zeros(1,numPoints+1);
 p(1) = p3;
-p0 = zeros(1,numPoints);
+p0 = zeros(1,numPoints+1);
 p0(1) = p03;
-T = zeros(1,numPoints);
+T = zeros(1,numPoints+1);
 T(1) = T3;
-rho = zeros(1,numPoints);
+rho = zeros(1,numPoints+1);
 rho(1) = rho3;
 
 for i = 1:length(Aratios) 
-    M(i) = fzero(@(M) (1/M)*((2/(gamma+1))*(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i),0.5);
+    M(i+1) = fzero(@(M) (1/M)*((2/(gamma+1))*(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i),0.5);
     
     [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i));
     p(i+1) = p(i)*prat;
@@ -240,4 +241,5 @@ for i = 1:length(Aratios)
 end
 mach = M(end)
 
+massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
 massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
