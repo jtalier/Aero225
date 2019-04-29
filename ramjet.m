@@ -42,6 +42,7 @@ w = 2;  % m, design value, width / depth into page
 
 %% Initial State
 [T1, a1, p1, rho1] = atmoscoesa(height);
+a1 = sqrt(gamma*R*T1);
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M1);
 T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
 u1 = M1*a1;
@@ -52,24 +53,6 @@ h1 = A1 / w;
 %% Inlet
 disp('Inlet:');
 
-syms Bsym;
-
-%{
-theta = 2;     % deg
-
-M = zeros(1,5);
-M(1) = M1;
-B = zeros(1,5);
-for i = 1:4
-    B(i) = fzero(@(B) tand(theta) - 2*cotd(B)* ...
-        (M(i)^2*(sind(B))^2 - 1) / (M(i)^2*(gamma + cosd(2*B)) + 2), theta);
-    Mn = M(i)*sind(B(i));
-    Mn2 = sqrt((Mn^2 + 2/(gamma-1))/((2*gamma/(gamma-1))*Mn^2 - 1));
-    M(i+1) = Mn2/sind(B(i)-theta);
-end
-
-B
-%}
 
 % OS 1
 numShocks = 4;
@@ -88,12 +71,12 @@ M(1) = M1;
 B = zeros(1,numShocks);
 %theta = zeros(1,numShocks);
 
-theta = 10;     % deg
+theta = 11;     % deg
 starting_guess = 30;
 
 for i = 1:numShocks
     if i == 4
-        theta = 12
+        %theta = 11;
         starting_guess = 50;
     end
     
@@ -120,22 +103,21 @@ end
 
 B
 M
-p0(end)/p0(1)
+%p0(end)/p0(1)
     
 
-[mach, Trat, prat, rhorat, downstream_mach, p0rat] = flownormalshock(gamma, M(end));
-M2 = downstream_mach;
-T2 = Trat*T(end);  p2 = prat*p(end);   rho2 = rhorat*rho(end);
+[mach, Trat, prat, rhorat, downstream_mach, p0rat] = ...
+    flownormalshock(gamma, M(end));
+%% State 3
+M3 = downstream_mach;
+T3 = Trat*T(end);  p3 = prat*p(end);   rho3 = rhorat*rho(end);
 
-%% State 2
-[T1, a1, p1, rho1] = atmoscoesa(height);
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M1);
-T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
-u1 = M1*a1;
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M2);
-T02 = T2/Trat;      p02 = p2/prat;
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
+T03 = T3/Trat;     p03 = p3/prat;   rho03 = rho3/rhorat;
+a3 = sqrt(gamma*R*T3);
+u3 = M3*a3;
 
-p02/p01
+p03/p01
 
 
 
@@ -216,5 +198,13 @@ plot(x,(sind(theta)*hit4_x)*ones(1,length(x)),'k');
 
 
 axis([0 13 0 4]);
+
+
+h3 = h1 - (sind(theta)*hit4_x);
+
+%% DIFFUSOR
+A4 = A1;
+rho3*M3*sqrt(gamma*T3*R)*w*h3
+
 
 
