@@ -52,6 +52,17 @@ height1 = A1 / w;
 
 
 
+%% Vectors for plotting along length
+xVecByLength = [0];
+pVecByLength = [p1];
+p0VecByLength = [p01];
+TVecByLength = [T1];
+T0VecByLength = [T01];
+MVecByLength = [M1];
+uVecByLength = [u1];
+% can back out h and s vectors from the above; no need to keep track
+% actually same with quite a few but whatever
+
 %% Inlet
 disp('Inlet:');
 
@@ -66,8 +77,12 @@ p0 = zeros(1,numShocks+1);
 p0(1) = p01;
 T = zeros(1,numShocks+1);
 T(1) = T1;
+T0 = zeros(1,numShocks+1);
+T0(1) = T01;
 rho = zeros(1,numShocks+1);
 rho(1) = rho1;
+u = zeros(1,numShocks+1);
+u(1) = u1;
 
 M(1) = M1;
 B = zeros(1,numShocks);
@@ -100,11 +115,12 @@ for i = 1:numShocks
     
     [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i+1));
     p0(i+1) = p(i+1)/prat;
+    T0(i+1) = T(i+1)/Trat;
+    u(i+1) = sqrt(gamma*R*T(i+1)) * M(i+1);
     
 end
 
-B
-M
+
 %p0(end)/p0(1)
 
 
@@ -129,15 +145,15 @@ x = 0:0.01:13;
 lower_wall_y = x*tand(theta);
 shock1_y = x*tand(B(1));
 
-plot(x,lower_wall_y,'k',x,height1*ones(1,length(x)),'k',x,shock1_y);
-hold on;
+%plot(x,lower_wall_y,'k',x,height1*ones(1,length(x)),'k',x,shock1_y);
+%hold on;
 %x*sind(B(1)) = h
 hit1_x = height1 / tand(B(1));
 % shock 2 m = -tand(B(2)-theta)
 % shock 2 point : hit1_x, h
 % y - h = -tand(B(2)-theta)*(x-hit1_x)
 shock2_y = height1 - tand(B(2)-theta)*(x - hit1_x);
-plot(x,shock2_y);
+%plot(x,shock2_y);
 
 % shock2_y = hit2_y = tand(theta)*hit2_x = h1 -tand(B(2)-theta)*(hit2_x - hit1_x)
 hit2_x = (height1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
@@ -147,7 +163,7 @@ hit2_x = (height1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
 % y - sind(theta)*hit2_x = sind(B(3))*(x-hit2_x)
 shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
 
-plot(x,shock3_y);
+%plot(x,shock3_y);
 
 
 % shock3_y = hit3_y = h1 = sind(theta)*hit2_x +sind(B(3))*(x - hit2_x)
@@ -159,7 +175,7 @@ hit3_x = (height1-tand(theta)*hit2_x + tand(B(3))*hit2_x) / ...
 % y - h1 = -sind(B(4)-theta)*(x-hit3_x)
 shock4_y = height1 -tand(B(4)-theta)*(x-hit3_x);
 
-plot(x,shock4_y);
+%plot(x,shock4_y);
 
 % shock4_y = hit4_y = sind(theta)*hit4_x = h1 -sind(B(4))*(hit4_x-hit3_x);
 hit4_x = (height1+tand(B(4)-theta)*hit3_x) / (tand(theta) + tand(B(4)-theta));
@@ -177,40 +193,107 @@ plot(x,height1*ones(1,length(x)),'k');
 % first shock
 x = 0:0.01:hit1_x;
 shock1_y = x*tand(B(1));
-plot(x,shock1_y); 
+plot(x,shock1_y);
+
+% Vectors for plotting along length
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p(2)*ones(1,length(x))];
+p0VecByLength = [p0VecByLength, p0(2)*ones(1,length(x))];
+TVecByLength = [TVecByLength, T(2)*ones(1,length(x))];
+T0VecByLength = [T0VecByLength, T0(2)*ones(1,length(x))];
+MVecByLength = [MVecByLength, M(2)*ones(1,length(x))];
+uVecByLength = [uVecByLength, u(2)*ones(1,length(x))];
 
 % second shock
 x = hit1_x:0.01:hit2_x;
 shock2_y = height1 -tand(B(2)-theta)*(x - hit1_x);
 plot(x,shock2_y);
 
+% Vectors for plotting along length
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p(3)*ones(1,length(x))];
+p0VecByLength = [p0VecByLength, p0(3)*ones(1,length(x))];
+TVecByLength = [TVecByLength, T(3)*ones(1,length(x))];
+T0VecByLength = [T0VecByLength, T0(3)*ones(1,length(x))];
+MVecByLength = [MVecByLength, M(3)*ones(1,length(x))];
+uVecByLength = [uVecByLength, u(3)*ones(1,length(x))];
+
 % third shock
 x = hit2_x:0.01:hit3_x;
 shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
 plot(x,shock3_y);
+
+% Vectors for plotting along length
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p(4)*ones(1,length(x))];
+p0VecByLength = [p0VecByLength, p0(4)*ones(1,length(x))];
+TVecByLength = [TVecByLength, T(4)*ones(1,length(x))];
+T0VecByLength = [T0VecByLength, T0(4)*ones(1,length(x))];
+MVecByLength = [MVecByLength, M(4)*ones(1,length(x))];
+uVecByLength = [uVecByLength, u(4)*ones(1,length(x))];
 
 % fourth shock
 x = hit3_x:0.01:hit4_x;
 shock4_y = height1 -tand(B(4)-theta)*(x-hit3_x);
 plot(x,shock4_y);
 
+% Vectors for plotting along length
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p(5)*ones(1,length(x))];
+p0VecByLength = [p0VecByLength, p0(5)*ones(1,length(x))];
+TVecByLength = [TVecByLength, T(5)*ones(1,length(x))];
+T0VecByLength = [T0VecByLength, T0(5)*ones(1,length(x))];
+MVecByLength = [MVecByLength, M(5)*ones(1,length(x))];
+uVecByLength = [uVecByLength, u(5)*ones(1,length(x))];
+
 % end of lower wall
 x = hit4_x:0.01:13;
 plot(x,(tand(theta)*hit4_x)*ones(1,length(x)),'k');
 
+height3 = height1 - (tand(theta)*hit4_x);
 
-axis([0 13 0 4]);
+% Normal Shock
+plot([hit4_x, hit4_x], [height1-height3, height1]);
+
+
+% Vectors for plotting along length
+length_straight = 0.5;
+x = hit4_x : 0.01 : hit4_x + length_straight;
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p3*ones(1,length(x))];
+p0VecByLength = [p0VecByLength, p03*ones(1,length(x))];
+TVecByLength = [TVecByLength, T3*ones(1,length(x))];
+T0VecByLength = [T0VecByLength, T03*ones(1,length(x))];
+MVecByLength = [MVecByLength, M3*ones(1,length(x))];
+uVecByLength = [uVecByLength, u3*ones(1,length(x))];
+
+
+
+% Shading in walls
+v2 = [0, 0; 
+    hit4_x, height1 - height3;
+    hit4_x + length_straight,  height1 - height3;
+    hit4_x + length_straight, 0;
+    hit1_x, height1
+    hit4_x + length_straight, height1
+    hit4_x + length_straight, height1 + 0.1
+    hit1_x, height1 + 0.1];
+f2 = [1 2 3 4; 
+    5 6 7 8];
+patch('Faces',f2,'Vertices',v2,'FaceColor','black')
+
+axis([0 hit4_x + length_straight 0 4]);
 axis equal;
 
 
-height3 = height1 - (tand(theta)*hit4_x);
+
 A3 = height3*w;
 
 
 
 %% DIFFUSER
-A3 = A3; %Starting aera of diffuser
-h3 = A3/w; %Starting Diffuser Height
+A3 = A3; %Starting area of diffuser
+height3 = A3/w; %Starting Diffuser Height
 A4 = A1; %End area of diffuser
 height4 = A4/w; %Diffuser Height
 
@@ -243,10 +326,30 @@ for i = 2:length(Aratios)
     T(i) = T03*Trat;
     rho(i) = rho03*rhorat;
 end
-mach = M(end)
+
+M4 = M(end);
+T4 = T(end);
+p4 = p(end);
+rho4 = rho(end);
+T04 = T03;
+p04 = p03;
+u = sqrt(gamma.*T.*R).*M;
+u4 = u(end);
 
 %massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
-massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
+%massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
+
+
+
+% Vectors for plotting along length
+x = linspace(hit4_x + 0.5, hit4_x + 3.5, numPoints);
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p];
+p0VecByLength = [p0VecByLength, p04*ones(1,length(x))];
+TVecByLength = [TVecByLength, T];
+T0VecByLength = [T0VecByLength, T04*ones(1,length(x))];
+MVecByLength = [MVecByLength, M];
+uVecByLength = [uVecByLength, u];
 
 
 
@@ -254,5 +357,58 @@ massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
 
 
 
+%close all;
 
-close all;
+
+%% Plots along Length of Engine (goes at end)
+
+figure('Position', [50 50 1200 720])
+hold on;
+
+% Pressure
+subplot(2,3,1);
+plot(xVecByLength, pVecByLength ./ 1000);
+grid on;
+xlabel('Length along Engine [m]');
+ylabel('Pressure [kPa]');
+
+% Stagnation pressure
+subplot(2,3,2);
+plot(xVecByLength, p0VecByLength ./ 1000);
+grid on;
+xlabel('Length along Engine [m]');
+ylabel('Stagnation Pressure [kPa]');
+ylim([0, max(p0VecByLength) ./ 1000 * 1.1]);
+
+% Temperature
+subplot(2,3,3);
+plot(xVecByLength, TVecByLength);
+grid on;
+xlabel('Length along Engine [m]');
+ylabel('Temperature [K]');
+ylim([0, max(TVecByLength) * 1.1]);
+
+% Stagnation Temperature
+subplot(2,3,4);
+plot(xVecByLength, T0VecByLength);
+grid on;
+xlabel('Length along Engine [m]');
+ylabel('Stagnation Temperature [K]');
+ylim([0, max(T0VecByLength) * 1.1]);
+
+% Mach Number
+subplot(2,3,5);
+plot(xVecByLength, MVecByLength);
+grid on;
+xlabel('Length along Engine [m]');
+ylabel('Mach');
+ylim([0, max(MVecByLength) * 1.1]);
+
+% Flow Speed
+subplot(2,3,6);
+plot(xVecByLength, uVecByLength);
+grid on;
+xlabel('Length along Engine [m]');
+ylabel('Flow Speed [m/s]');
+ylim([0, max(uVecByLength) * 1.1]);
+
