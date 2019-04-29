@@ -248,3 +248,19 @@ mach = M(end)
 
 massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
 massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
+
+
+
+
+%% Combustor
+
+T04Star = 1; %FROM DIFFFUSER
+T04 = 800; %FROM DIFFFUSER
+
+mDotFuel = 5; %Kg/s CHANGE THIS
+
+foRatio = mDotFuel ./ massflow;
+
+T04P = ((foRatio .* q_HV) ./ cp) + T04;
+
+[mach4P, T4PRatio, P4PRatio, rho4PRatio, u4PRatio, T04PRatio, P04PRatio] = flowrayleigh(gamma, T04P./T04Star, 'totaltsub');
