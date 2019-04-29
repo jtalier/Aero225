@@ -243,16 +243,10 @@ for i = 2:length(Aratios)
     T(i) = T03*Trat;
     rho(i) = rho03*rhorat;
 end
-mach = M(end)
+M4 = M(end);
 
 %massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
-massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
-
-
-
-
-
-
+%massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
 
 
 close all;
