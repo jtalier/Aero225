@@ -453,7 +453,7 @@ T4PP = Trat*Tstar;   p4PP = pstar*prat;   rho4PP = rhorat*rhostar;
 % COMBUSTION CHAMBER --- RAYLEIGH FLOW
 
 [~, Trat, prat, rhorat, ~, T0rat, p0rat] = flowrayleigh(gamma, M4PP, 'mach');
-Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = T04/Trat;   p0star = p04PP/p0rat;
+Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = T04/T0rat;   p0star = p04PP/p0rat;
 
 [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
 T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    p05 = p0rat*pstar;
@@ -467,7 +467,7 @@ A5 = A4;
 
 
 %% State 5
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5);
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5, 'mach');
 T05 = T5/Trat;     p05 = p5/prat;   rho05 = rho5/rhorat;
 a5 = sqrt(gamma*R*T5);
 u5 = M5*a5;
