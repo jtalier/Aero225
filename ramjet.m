@@ -254,13 +254,22 @@ massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
 
 %% Combustor
 
-T04Star = 1; %FROM DIFFFUSER
-T04 = 800; %FROM DIFFFUSER
+[mach4, T4Ratio, P4Ratio, rho4Ratio, u4Ratio, T04Ratio, P04Ratio] = flowrayleigh(gamma, M(end), 'mach');
 
-mDotFuel = 5; %Kg/s CHANGE THIS
+T04 = T03;
+T04Star = (1/T04Ratio) * T04;
+Rho04Star = (1/rho4Ratio) * rho(1);
+T4Star = (1/T4Ratio) * T(end);
 
-foRatio = mDotFuel ./ massflow;
+mDotFuel = 1; %Kg/s CHANGE THIS
+
+foRatio = mDotFuel ./ m_dot;
 
 T04P = ((foRatio .* q_HV) ./ cp) + T04;
 
 [mach4P, T4PRatio, P4PRatio, rho4PRatio, u4PRatio, T04PRatio, P04PRatio] = flowrayleigh(gamma, T04P./T04Star, 'totaltsub');
+
+(Rho04Star * rho4PRatio) * A4 * sqrt(gamma*T4PRatio* T4Star*R)*mach4P
+
+[mach4P, T4PPRatio, P4PPRatio, rho4PPRatio, u4PPRatio, u4P0PPRatio, fanno] = flowfanno(gamma, mach4P, 'mach');
+
