@@ -497,13 +497,13 @@ Ae = (At/Me)*((1+((gamma - 1)/2)*(Me.^2))/((gamma + 1)/2)).^((gamma + 1)/(2*(gam
 %exit area
 
 %total pressure and temperature
-Pe = P05 * (1 + ((gamma - 1)/2)*(Me.^2)).^(-gamma/(gamma - 1));
+pe = p05 * (1 + ((gamma - 1)/2)*(Me.^2)).^(-gamma/(gamma - 1));
 
 Te = T05 * ((1 + ((gamma - 1)/2)*(Me.^2)).^(-1));
 
 Ve = Me * sqrt(gamma*R*Te);
 
-F = m_dot * Ve + (Pe - p1) * Ae; %thrust
+F = m_dot * Ve + (pe - p1) * Ae; %thrust
 
 
 
