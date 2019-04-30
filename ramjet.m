@@ -301,6 +301,8 @@ height3 = A3/w; %Starting Diffuser Height
 A4 = 6; %End area of diffuser
 height4 = A4/w; %Diffuser Height
 
+%Diffuser Length = 3 m
+
 %Find A*
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
 a_star = A3/arearat;
