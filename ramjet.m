@@ -365,8 +365,8 @@ uVecByLength = [uVecByLength, u];
 %% Combustor
 disp('Combustor:');
 
-length_injector = 3;
-length_flameholder = 3;
+length_injector = 1;
+length_flameholder = 1;
 %length_combustor = ???
 
 %% Jack's Version
@@ -432,7 +432,7 @@ massflow = (Rho4PPStar * rho5Ratio) * A4 * sqrt(gamma*1800*R)*M5
 
 %% Dan's go at a combustor
 
-mDotFuel = 1; %Kg/s CHANGE THIS
+mDotFuel = 1; %kg/s CHANGE THIS
 fRatio = mDotFuel / m_dot;
 
 T05 = ((fRatio * q_HV) / cp) + T04;
@@ -458,7 +458,6 @@ Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = 
 [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
 T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    p05 = p0rat*pstar;
 
-
 % is T5 < 1800?
 
 %Mass is conserved
@@ -472,6 +471,7 @@ T05 = T5/Trat;     p05 = p5/prat;   rho05 = rho5/rhorat;
 a5 = sqrt(gamma*R*T5);
 u5 = M5*a5;
 h5 = cp*T5;
+
 
 
 
