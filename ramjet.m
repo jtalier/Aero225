@@ -1,6 +1,6 @@
-%% Dan Maguire
+%% Dan Maguire, Jack Taliercio, Katie Lerond, Kevin Vanderwest
 %% AEROSP 225
-%% Project
+%% Final Project
 
 clear;
 clc;
@@ -435,6 +435,9 @@ grid on;
 % Adding states
 plot((gamma/(gamma-1)).*log(T3/T1) - log(p3/p1), h3/h1, 'o');
 plot((gamma/(gamma-1)).*log(T4/T1) - log(p4/p1), h4/h1, 'o');
+%plot((gamma/(gamma-1)).*log(T5/T1) - log(p5/p1), h5/h1, 'o');
+%plot((gamma/(gamma-1)).*log(T6/T1) - log(p6/p1), h6/h1, 'o');
+%plot((gamma/(gamma-1)).*log(T7/T1) - log(p7/p1), h7/h1, 'o');
 
 % Making plot look nice and adding legend
 ax = gca;
