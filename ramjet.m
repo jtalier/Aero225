@@ -301,6 +301,8 @@ height3 = A3/w; %Starting Diffuser Height
 A4 = 6; %End area of diffuser
 height4 = A4/w; %Diffuser Height
 
+%Diffuser Length = 3 m
+
 %Find A*
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
 a_star = A3/arearat;
@@ -367,6 +369,68 @@ length_injector = 1;
 length_flameholder = 1;
 %length_combustor = ???
 
+%% Jack's Version
+%{
+[mach4, T4Ratio, P4Ratio, rho4Ratio, u4Ratio, T04Ratio, P04Ratio] = flowrayleigh(gamma, M4, 'mach');
+
+%T04 = T03;
+T04Star = (1/T04Ratio) * T04;
+Rho04Star = (1/rho4Ratio) * rho4;
+T4Star = (1/T4Ratio) * T4;
+P4Star = (1/P4Ratio) * p4;
+
+mDotFuel = 1; %Kg/s CHANGE THIS
+
+foRatio = mDotFuel ./ m_dot;
+
+T04P = ((foRatio .* q_HV) ./ cp) + T04;
+
+[mach4P, T4PRatio, P4PRatio, rho4PRatio, u4PRatio, T04PRatio, P04PRatio] = flowrayleigh(gamma, T04P./T04Star, 'totaltsub');
+
+
+
+
+%massflow = (Rho04Star * rho4PRatio) * A4 * sqrt(gamma*T4PRatio* T4Star*R)*mach4P
+
+P4P = P4PRatio * P4Star;
+
+
+[mach4P, T4PPRatio, P4PPRatio, rho4PPRatio, u4PPRatio, u4P0PPRatio, fanno] = flowfanno(gamma, mach4P, 'mach');
+
+Rho4PStar = (1/rho4PPRatio) * (Rho04Star * rho4PRatio);
+T4PPStar = (1/T4PPRatio) * (T4PRatio * T4Star);
+P4PPStar = (1/P4PPRatio) * P4P;
+
+K=3;
+
+P04PPRatio = (1- (((gamma * K)/2)*mach4P^2)*(1+(((gamma - 1)/2)*mach4P^2))^(-gamma/(gamma-1)));
+
+P04PPRatio = P04PPRatio * P4PPRatio;
+
+[mach4PP, T4PPRatio, P4PPRatio, rho4PPRatio, u4PPRatio, u4P0PPRatio, fanno] = flowfanno(gamma, P04PPRatio, 'totalpsub');
+
+T4PP = T4PPRatio* T4PPStar;
+rho4PP = (Rho4PStar * rho4PPRatio);
+P4PP = P4PPRatio * P4PPStar;
+
+%massflow = (Rho4PStar * rho4PPRatio) * A4 * sqrt(gamma*T4PPRatio* T4PPStar*R)*mach4PP
+
+[mach4PP, T4PPRatio, P4PPRatio, rho4PPRatio, u4PPRatio, T04PPRatio, P04PPRatio] = flowrayleigh(gamma, mach4PP, 'mach');
+
+Rho4PPStar = (1/rho4PPRatio) * rho4PP;
+T4PPStar = (1/T4PPRatio) * (T4PP);
+P4PPStar = (1/P4PPRatio) * P4PP;
+
+T5 = 1800;
+T5Ratio = T5/T4PPStar;
+
+[M5, T5Ratio, P5Ratio, rho5Ratio, u5Ratio, T05PPRatio, P05Ratio] = flowrayleigh(gamma, T5Ratio, 'templo');
+
+
+%Mass is conserved
+massflow = (Rho4PPStar * rho5Ratio) * A4 * sqrt(gamma*1800*R)*M5
+%}
+
 
 
 %% Dan's go at a combustor
@@ -422,11 +486,24 @@ p05
 
 
 
+%% Nozzle
 
+Me = sqrt((2/(gamma - 1))*((p5/p1).^((gamma-1)/gamma) - 1)); %exit Mach (p5 - chamber pressure)
 
+At = (1/arearat)*A5;
+%throat area
 
+Ae = (At/Me)*((1+((gamma - 1)/2)*(Me.^2))/((gamma + 1)/2)).^((gamma + 1)/(2*(gamma - 1)));%exit area
+%exit area
 
+%total pressure and temperature
+Pe = P05 * (1 + ((gamma - 1)/2)*(Me.^2)).^(-gamma/(gamma - 1));
 
+Te = T05 * ((1 + ((gamma - 1)/2)*(Me.^2)).^(-1));
+
+Ve = Me * sqrt(gamma*R*Te);
+
+F = m_dot * Ve + (Pe - p1) * Ae; %thrust
 
 
 
