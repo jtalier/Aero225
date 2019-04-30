@@ -295,19 +295,19 @@ A3 = height3*w;
 
 
 %% DIFFUSER
-disp('Diffusor:');
+disp('diffuser:');
 %A3 = A3; %Starting area of diffuser
 height3 = A3/w; %Starting Diffuser Height
 A4 = 6; %End area of diffuser
 height4 = A4/w; %Diffuser Height
+
+%Diffuser Length = 3 m
 
 %Find A*
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
 a_star = A3/arearat;
 
 numPoints = 100;
-%L_diff = 0.5; %[meters] %Length of diffuser
-%L = linspace(0,L_diff,100);
 Aratios = linspace(A3,A4,numPoints) ./ a_star;
 
 %Initialize Variables
@@ -351,9 +351,9 @@ T04 = T4/Trat;     p04 = p4/prat;   rho04 = rho4/rhorat;
 
 
 % Vectors for plotting along length
-length_diffusor = 3;
-x_endDiffusor = x_endInlet + length_diffusor;
-x = linspace(x_endInlet, x_endDiffusor, numPoints);
+length_diffuser = 3;
+x_enddiffuser = x_endInlet + length_diffuser;
+x = linspace(x_endInlet, x_enddiffuser, numPoints);
 xVecByLength = [xVecByLength, x];
 pVecByLength = [pVecByLength, p];
 p0VecByLength = [p0VecByLength, p04*ones(1,length(x))];
@@ -365,8 +365,8 @@ uVecByLength = [uVecByLength, u];
 %% Combustor
 disp('Combustor:');
 
-length_injector = 3;
-length_flameholder = 3;
+length_injector = 1;
+length_flameholder = 1;
 %length_combustor = ???
 
 %% Jack's Version
@@ -435,7 +435,7 @@ massflow = (Rho4PPStar * rho5Ratio) * A4 * sqrt(gamma*1800*R)*M5
 
 %% Dan's go at a combustor
 
-mDotFuel = 1; %Kg/s CHANGE THIS
+mDotFuel = 1; %kg/s CHANGE THIS
 fRatio = mDotFuel / m_dot;
 
 T05 = ((fRatio * q_HV) / cp) + T04;
@@ -456,11 +456,10 @@ T4PP = Trat*Tstar;   p4PP = pstar*prat;   rho4PP = rhorat*rhostar;
 % COMBUSTION CHAMBER --- RAYLEIGH FLOW
 
 [~, Trat, prat, rhorat, ~, T0rat, p0rat] = flowrayleigh(gamma, M4PP, 'mach');
-Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = T04/Trat;   p0star = p04PP/p0rat;
+Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = T04/T0rat;   p0star = p04PP/p0rat;
 
 [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
 T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    p05 = p0rat*pstar;
-
 
 % is T5 < 1800?
 
@@ -470,7 +469,7 @@ A5 = A4;
 
 
 %% State 5
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5);
+[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5, 'mach');
 T05 = T5/Trat;     p05 = p5/prat;   rho05 = rho5/rhorat;
 a5 = sqrt(gamma*R*T5);
 u5 = M5*a5;
@@ -501,6 +500,7 @@ Te = T05 * ((1 + ((gamma - 1)/2)*(Me.^2)).^(-1));
 Ve = Me * sqrt(gamma*R*Te);
 
 F = m_dot * Ve + (Pe - p1) * Ae; %thrust
+
 
 
 
