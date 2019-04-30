@@ -369,7 +369,6 @@ length_injector = 3;
 length_flameholder = 3;
 %length_combustor = ???
 
-%% Jack's Version
 %{
 [mach4, T4Ratio, P4Ratio, rho4Ratio, u4Ratio, T04Ratio, P04Ratio] = flowrayleigh(gamma, M4, 'mach');
 
@@ -430,7 +429,6 @@ massflow = (Rho4PPStar * rho5Ratio) * A4 * sqrt(gamma*1800*R)*M5
 
 
 
-%% Dan's go at a combustor
 
 mDotFuel = 1; %Kg/s CHANGE THIS
 fRatio = mDotFuel / m_dot;
@@ -459,14 +457,16 @@ Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = 
 T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    p05 = p0rat*pstar;
 
 
-% is T5 < 1800?
-
+% is T5 < 1800??
 %Mass is conserved
-A5 = A4;
-%massflow = rho5*M5*sqrt(gamma*R*T5)*A5
+massflow = (Rho4PPStar * rho5Ratio) * A4 * sqrt(gamma*1800*R)*M5
+
+
 
 
 %% State 5
+p5 = P5Ratio * P4PPStar
+rho5 = p5/R/T5;
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5);
 T05 = T5/Trat;     p05 = p5/prat;   rho05 = rho5/rhorat;
 a5 = sqrt(gamma*R*T5);
