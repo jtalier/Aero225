@@ -66,7 +66,6 @@ uVecByLength = [u1];
 %% Inlet
 disp('Inlet:');
 
-
 % OS 1
 numShocks = 4;
 M = zeros(1,numShocks+1);
@@ -364,6 +363,11 @@ uVecByLength = [uVecByLength, u];
 
 
 %close all;
+
+%% State 5
+%nozzle
+
+
 
 
 %% Plots along Length of Engine (goes at end)
