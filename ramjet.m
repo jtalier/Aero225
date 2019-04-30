@@ -483,11 +483,24 @@ h5 = cp*T5;
 
 
 
+%% Nozzle
 
+Me = sqrt((2/(gamma - 1))*((p5/p1).^((gamma-1)/gamma) - 1)); %exit Mach (p5 - chamber pressure)
 
+At = (1/arearat)*A5;
+%throat area
 
+Ae = (At/Me)*((1+((gamma - 1)/2)*(Me.^2))/((gamma + 1)/2)).^((gamma + 1)/(2*(gamma - 1)));%exit area
+%exit area
 
+%total pressure and temperature
+Pe = P05 * (1 + ((gamma - 1)/2)*(Me.^2)).^(-gamma/(gamma - 1));
 
+Te = T05 * ((1 + ((gamma - 1)/2)*(Me.^2)).^(-1));
+
+Ve = Me * sqrt(gamma*R*Te);
+
+F = m_dot * Ve + (Pe - p1) * Ae; %thrust
 
 
 
