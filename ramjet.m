@@ -487,6 +487,28 @@ p05
 
 
 %% Nozzle
+At = (1/arearat)*A5;
+
+
+%% State 7
+p7 = p1;
+T07 = T05;
+p07 = p05;
+rho07 = rho05;
+[M7, Trat, prat, rhorat, arearat] = flowisentropic(gamma, p7/p05, 'pres');
+T7 = T07*Trat;  p7 = p07*prat;  rho7 = rho07*rhorat;
+A7 = At * arearat;
+a7 = sqrt(gamma*R*T7);
+u7 = M7*a7;
+h7 = cp*T7;
+
+F = m_dot * u7 + (p7 - p1) * A7; %thrust
+
+
+
+
+%{
+
 
 Me = sqrt((2/(gamma - 1))*((p5/p1).^((gamma-1)/gamma) - 1)); %exit Mach (p5 - chamber pressure)
 
@@ -505,7 +527,7 @@ Ve = Me * sqrt(gamma*R*Te);
 
 F = m_dot * Ve + (pe - p1) * Ae; %thrust
 
-
+%}
 
 
 
