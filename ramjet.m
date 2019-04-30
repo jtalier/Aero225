@@ -423,6 +423,10 @@ a5 = sqrt(gamma*R*T5);
 u5 = M5*a5;
 h5 = cp*T5;
 
+u5
+%p5
+p05
+
 
 
 
@@ -517,7 +521,7 @@ grid on;
 % Adding states
 plot((gamma/(gamma-1)).*log(T3/T1) - log(p3/p1), h3/h1, 'o');
 plot((gamma/(gamma-1)).*log(T4/T1) - log(p4/p1), h4/h1, 'o');
-%plot((gamma/(gamma-1)).*log(T5/T1) - log(p5/p1), h5/h1, 'o');
+plot((gamma/(gamma-1)).*log(T5/T1) - log(p5/p1), h5/h1, 'o');
 %plot((gamma/(gamma-1)).*log(T6/T1) - log(p6/p1), h6/h1, 'o');
 %plot((gamma/(gamma-1)).*log(T7/T1) - log(p7/p1), h7/h1, 'o');
 
@@ -530,5 +534,5 @@ yDist = ax.YLim(2) - ax.YLim(1);
 ax.YLim(1) = ax.YLim(1) - yDist/4;
 ax.YLim(2) = ax.YLim(2) + yDist/4;
 ax.YLim(1) = 0;
-legend('Process', 'State 1', 'State 3', 'State 4');
+legend('Process', 'State 1', 'State 3', 'State 4', 'State 5');
 
