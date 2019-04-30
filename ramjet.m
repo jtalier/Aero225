@@ -138,7 +138,7 @@ a3 = sqrt(gamma*R*T3);
 u3 = M3*a3;
 h3 = cp*T3;
 
-p03/p01
+%p03/p01
 
 
 
@@ -260,7 +260,8 @@ plot([hit4_x, hit4_x], [height1-height3, height1]);
 
 % Vectors for plotting along length
 length_straight = 0.5;
-x = hit4_x : 0.01 : hit4_x + length_straight;
+x_endInlet = hit4_x + length_straight;
+x = hit4_x : 0.01 : x_endInlet;
 xVecByLength = [xVecByLength, x];
 pVecByLength = [pVecByLength, p3*ones(1,length(x))];
 p0VecByLength = [p0VecByLength, p03*ones(1,length(x))];
@@ -294,7 +295,8 @@ A3 = height3*w;
 
 
 %% DIFFUSER
-A3 = A3; %Starting area of diffuser
+disp('Diffusor:');
+%A3 = A3; %Starting area of diffuser
 height3 = A3/w; %Starting Diffuser Height
 A4 = 6; %End area of diffuser
 height4 = A4/w; %Diffuser Height
@@ -343,13 +345,15 @@ h4 = cp*T4;
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M4);
 T04 = T4/Trat;     p04 = p4/prat;   rho04 = rho4/rhorat;
 
-massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
-massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
+%massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
+%massflow = rho(end)*A4*sqrt(gamma*T(end)*R)*M(end)
 
 
 
 % Vectors for plotting along length
-x = linspace(hit4_x + 0.5, hit4_x + 3.5, numPoints);
+length_diffusor = 3;
+x_endDiffusor = x_endInlet + length_diffusor;
+x = linspace(x_endInlet, x_endDiffusor, numPoints);
 xVecByLength = [xVecByLength, x];
 pVecByLength = [pVecByLength, p];
 p0VecByLength = [p0VecByLength, p04*ones(1,length(x))];
@@ -359,13 +363,18 @@ MVecByLength = [MVecByLength, M];
 uVecByLength = [uVecByLength, u];
 
 %% Combustor
+disp('Combustor:');
 
-[mach4, T4Ratio, P4Ratio, rho4Ratio, u4Ratio, T04Ratio, P04Ratio] = flowrayleigh(gamma, M(end), 'mach');
+length_injector = 3;
+length_flameholder = 3;
+%length_combustor = ???
 
-T04 = T03;
+[mach4, T4Ratio, P4Ratio, rho4Ratio, u4Ratio, T04Ratio, P04Ratio] = flowrayleigh(gamma, M4, 'mach');
+
+%T04 = T03;
 T04Star = (1/T04Ratio) * T04;
-Rho04Star = (1/rho4Ratio) * rho(end);
-T4Star = (1/T4Ratio) * T(end);
+Rho04Star = (1/rho4Ratio) * rho4;
+T4Star = (1/T4Ratio) * T4;
 P4Star = (1/P4Ratio) * p4;
 
 mDotFuel = 1; %Kg/s CHANGE THIS
@@ -376,9 +385,10 @@ T04P = ((foRatio .* q_HV) ./ cp) + T04;
 
 [mach4P, T4PRatio, P4PRatio, rho4PRatio, u4PRatio, T04PRatio, P04PRatio] = flowrayleigh(gamma, T04P./T04Star, 'totaltsub');
 
-massflow = (Rho04Star * rho4PRatio) * A4 * sqrt(gamma*T4PRatio* T4Star*R)*mach4P
+%massflow = (Rho04Star * rho4PRatio) * A4 * sqrt(gamma*T4PRatio* T4Star*R)*mach4P
 
 P4P = P4PRatio * P4Star;
+
 
 [mach4P, T4PPRatio, P4PPRatio, rho4PPRatio, u4PPRatio, u4P0PPRatio, fanno] = flowfanno(gamma, mach4P, 'mach');
 
@@ -398,7 +408,7 @@ T4PP = T4PPRatio* T4PPStar;
 rho4PP = (Rho4PStar * rho4PPRatio);
 P4PP = P4PPRatio * P4PPStar;
 
-massflow = (Rho4PStar * rho4PPRatio) * A4 * sqrt(gamma*T4PPRatio* T4PPStar*R)*mach4PP
+%massflow = (Rho4PStar * rho4PPRatio) * A4 * sqrt(gamma*T4PPRatio* T4PPStar*R)*mach4PP
 
 [mach4PP, T4PPRatio, P4PPRatio, rho4PPRatio, u4PPRatio, T04PPRatio, P04PPRatio] = flowrayleigh(gamma, mach4PP, 'mach');
 
@@ -406,7 +416,8 @@ Rho4PPStar = (1/rho4PPRatio) * rho4PP;
 T4PPStar = (1/T4PPRatio) * (T4PP);
 P4PPStar = (1/P4PPRatio) * P4PP;
 
-T5Ratio = 1800/T4PPStar;
+T5 = 1800;
+T5Ratio = T5/T4PPStar;
 
 [mach5, T5Ratio, P5Ratio, rho5Ratio, u5Ratio, T05PPRatio, P05Ratio] = flowrayleigh(gamma, T5Ratio, 'templo');
 
@@ -415,13 +426,36 @@ T5Ratio = 1800/T4PPStar;
 massflow = (Rho4PPStar * rho5Ratio) * A4 * sqrt(gamma*1800*R)*mach5
 
 %T5
-T5 = 1800;
+T5;
 
 %P5
-P5 = P5Ratio * P4PPStar
+p5 = P5Ratio * P4PPStar
 
 
-%% Graph Buisness
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%% Graph Business
 figure('Position', [50 50 1200 720])
 hold on;
 
