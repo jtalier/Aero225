@@ -48,6 +48,7 @@ T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
 u1 = M1*a1;
 A1 = m_dot / rho1 / u1;
 h1 = cp*T1;
+A1 = 6.1250
 height1 = A1 / w;
 
 
@@ -307,36 +308,31 @@ a_star = A3/arearat;
 numPoints = 100;
 Aratios = linspace(A3,A4,numPoints) ./ a_star;
 
-%Initialize Variables
-M = zeros(1,numPoints);
-M(1) = M3;
-p = zeros(1,numPoints);
-p(1) = p3;
-T = zeros(1,numPoints);
-T(1) = T3;
-rho = zeros(1,numPoints);
-rho(1) = rho3;
+M4Vec(1) = M3;
+p4Vec(1) = p3;
+T4Vec(1) = T3;
+rho4Vec(1) = rho3;
 
 for i = 2:length(Aratios) 
-    M(i) = fzero(@(M) (1/M)*((2/(gamma+1)) ...
+    M4Vec(i) = fzero(@(M) (1/M)*((2/(gamma+1)) ...
         *(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i), ...
-        0.5);
+        [0.01 1]);
     
-    [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M(i));
-    p(i) = p03*prat;
-    T(i) = T03*Trat;
-    rho(i) = rho03*rhorat;
+    [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M4Vec(i));
+    p4Vec(i) = p03*prat;
+    T4Vec(i) = T03*Trat;
+    rho4Vec(i) = rho03*rhorat;
 end
 
 %% State 4
-M4 = M(end);
-T4 = T(end);
-p4 = p(end);
-rho4 = rho(end);
+M4 = M4Vec(end);
+T4 = T4Vec(end);
+p4 = p4Vec(end);
+rho4 = rho4Vec(end);
 %T04 = T03;
 %p04 = p03;
-u = sqrt(gamma.*T.*R).*M;
-u4 = u(end);
+u4Vec = sqrt(gamma.*T4Vec.*R).*M4Vec;
+u4 = u4Vec(end);
 a4 = sqrt(gamma*R*T4);
 h4 = cp*T4;
 [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M4);
@@ -352,12 +348,12 @@ length_diffuser = 3;
 x_endDiffuser = x_endInlet + length_diffuser;
 x = linspace(x_endInlet, x_endDiffuser, numPoints);
 xVecByLength = [xVecByLength, x];
-pVecByLength = [pVecByLength, p];
+pVecByLength = [pVecByLength, p4Vec];
 p0VecByLength = [p0VecByLength, p04*ones(1,length(x))];
-TVecByLength = [TVecByLength, T];
+TVecByLength = [TVecByLength, T4Vec];
 T0VecByLength = [T0VecByLength, T04*ones(1,length(x))];
-MVecByLength = [MVecByLength, M];
-uVecByLength = [uVecByLength, u];
+MVecByLength = [MVecByLength, M4Vec];
+uVecByLength = [uVecByLength, u4Vec];
 
 %% Combustor
 disp('Combustor:');
