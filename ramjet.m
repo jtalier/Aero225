@@ -41,14 +41,14 @@ w = 2;  % m, design value, width / depth into page
 
 
 %% Initial State
-[T1, a1, p1, rho1] = atmoscoesa(height);
+[T1, ~, p1, rho1] = atmoscoesa(height);
 a1 = sqrt(gamma*R*T1);
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M1);
+[~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M1);
 T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
 u1 = M1*a1;
-A1 = m_dot / rho1 / u1;
+%A1 = m_dot / rho1 / u1;
 h1 = cp*T1;
-A1 = 6.1250
+A1 = 6.1250;
 height1 = A1 / w;
 
 
@@ -114,7 +114,7 @@ for i = 1:numShocks
     Trat = prat/rhorat;
     T(i+1) = T(i)*Trat;
     
-    [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i+1));
+    [~, Trat, prat, ~, ~] = flowisentropic(gamma, M(i+1));
     p0(i+1) = p(i+1)/prat;
     T0(i+1) = T(i+1)/Trat;
     u(i+1) = sqrt(gamma*R*T(i+1)) * M(i+1);
@@ -143,7 +143,7 @@ h3 = cp*T3;
 %% Inlet Geometry
 x = 0:0.01:13;
 lower_wall_y = x*tand(theta);
-shock1_y = x*tand(B(1));
+%shock1_y = x*tand(B(1));
 
 %plot(x,lower_wall_y,'k',x,height1*ones(1,length(x)),'k',x,shock1_y);
 %hold on;
@@ -152,7 +152,7 @@ hit1_x = height1 / tand(B(1));
 % shock 2 m = -tand(B(2)-theta)
 % shock 2 point : hit1_x, h
 % y - h = -tand(B(2)-theta)*(x-hit1_x)
-shock2_y = height1 - tand(B(2)-theta)*(x - hit1_x);
+%shock2_y = height1 - tand(B(2)-theta)*(x - hit1_x);
 %plot(x,shock2_y);
 
 % shock2_y = hit2_y = tand(theta)*hit2_x = h1 -tand(B(2)-theta)*(hit2_x - hit1_x)
@@ -161,7 +161,7 @@ hit2_x = (height1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
 % shock 3 m = sind(B(3))
 % shock 3 point : hit2_x, sind(theta)*hit2_x
 % y - sind(theta)*hit2_x = sind(B(3))*(x-hit2_x)
-shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
+%shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
 
 %plot(x,shock3_y);
 
@@ -173,7 +173,7 @@ hit3_x = (height1-tand(theta)*hit2_x + tand(B(3))*hit2_x) / ...
 % shock 4 m = -sind(B(4)-theta)
 % shock 4 point : hit3_x, h1
 % y - h1 = -sind(B(4)-theta)*(x-hit3_x)
-shock4_y = height1 - tand(B(4)-theta)*(x-hit3_x);
+%shock4_y = height1 - tand(B(4)-theta)*(x-hit3_x);
 
 %plot(x,shock4_y);
 
