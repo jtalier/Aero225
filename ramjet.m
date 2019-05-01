@@ -117,12 +117,10 @@ for i = 1:numShocks
     p0(i+1) = p(i+1)/prat;
     T0(i+1) = T(i+1)/Trat;
     u(i+1) = sqrt(gamma*R*T(i+1)) * M(i+1);
-    
 end
 
 
 %p0(end)/p0(1)
-
 
 [mach, Trat, prat, rhorat, downstream_mach, ~] = ...
     flownormalshock(gamma, M(end));
@@ -447,7 +445,7 @@ x_endCombustor = x_endFlameholder + length_combustor;
 x = linspace(x_endFlameholder, x_endCombustor, numPoints);
 xVecByLength = [xVecByLength, x];
 pVecByLength = [pVecByLength, p5Vec];
-p0VecByLength = [p0VecByLength, p5Vec];
+p0VecByLength = [p0VecByLength, p05Vec];
 TVecByLength = [TVecByLength, T5Vec];
 T0VecByLength = [T0VecByLength, T05Vec];
 MVecByLength = [MVecByLength, M5Vec];
