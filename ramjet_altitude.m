@@ -672,12 +672,14 @@ end
 %% Altitude Plots
 figure(1);
 plot(HEIGHTS * 1E-3,Thrust_ALTITUDE * 1E-3);
-title('Thrust Altitute Performace');
+grid on;
+title('Thrust Altitude Performance');
 xlabel('Altitude [km]');
 ylabel('Thrust [kN]');
 
 figure(2);
 plot(HEIGHTS * 1E-3,I_sp_ALTITUDE);
+grid on;
 title('Specific Impulse Altitude Performance');
 xlabel('Altitude [km]');
-ylabel('I_sp [1/s]');
+ylabel('I_s_p [s]');
