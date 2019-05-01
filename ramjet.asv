@@ -10,6 +10,7 @@ format short g;
 %% Inputs
 M1      = 3.00;         % unitless             Mach #
 height  = 30E3;         % m                    Cruise Altitude
+numPoints = 20;
 % Fuel Type: Hydrogen
 q_HV    = 120E6;        % J/kg                 Heating Value
 MW      = 28.9;         % g/mol                Molecular Weight
@@ -41,25 +42,26 @@ w = 2;  % m, design value, width / depth into page
 
 
 %% Initial State
-[T1, a1, p1, rho1] = atmoscoesa(height);
+[T1, ~, p1, rho1] = atmoscoesa(height);
 a1 = sqrt(gamma*R*T1);
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M1);
+[~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M1);
 T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
 u1 = M1*a1;
-A1 = m_dot / rho1 / u1;
+%A1 = m_dot / rho1 / u1;
 h1 = cp*T1;
+A1 = 6.1250;
 height1 = A1 / w;
 
 
 
 %% Vectors for plotting along length
-xVecByLength = [0];
-pVecByLength = [p1];
-p0VecByLength = [p01];
-TVecByLength = [T1];
-T0VecByLength = [T01];
-MVecByLength = [M1];
-uVecByLength = [u1];
+xVecByLength = [-10 0];
+pVecByLength = [p1 p1];
+p0VecByLength = [p01 p01];
+TVecByLength = [T1 T1];
+T0VecByLength = [T01 T01];
+MVecByLength = [M1 M1];
+uVecByLength = [u1 u1];
 % can back out h and s vectors from the above; no need to keep track
 % actually same with quite a few but whatever
 
@@ -113,16 +115,23 @@ for i = 1:numShocks
     Trat = prat/rhorat;
     T(i+1) = T(i)*Trat;
     
-    [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i+1));
+    [~, Trat, prat, ~, ~] = flowisentropic(gamma, M(i+1));
     p0(i+1) = p(i+1)/prat;
     T0(i+1) = T(i+1)/Trat;
     u(i+1) = sqrt(gamma*R*T(i+1)) * M(i+1);
-    
 end
 
+T2 = T(end);
+p2 = p(end);
+M2 = M(end);
+rho2 = rho(end);
+a2 = sqrt(gamma*R*T2);
+u2 = M2*a2;
+h2 = cp*T2;
+[~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M2);
+T02 = T2/Trat;     p02 = p2/prat;   rho02 = rho2/rhorat;
 
 %p0(end)/p0(1)
-
 
 [mach, Trat, prat, rhorat, downstream_mach, ~] = ...
     flownormalshock(gamma, M(end));
@@ -144,7 +153,7 @@ h3 = cp*T3;
 %% Inlet Geometry
 x = 0:0.01:13;
 lower_wall_y = x*tand(theta);
-shock1_y = x*tand(B(1));
+%shock1_y = x*tand(B(1));
 
 %plot(x,lower_wall_y,'k',x,height1*ones(1,length(x)),'k',x,shock1_y);
 %hold on;
@@ -153,7 +162,7 @@ hit1_x = height1 / tand(B(1));
 % shock 2 m = -tand(B(2)-theta)
 % shock 2 point : hit1_x, h
 % y - h = -tand(B(2)-theta)*(x-hit1_x)
-shock2_y = height1 - tand(B(2)-theta)*(x - hit1_x);
+%shock2_y = height1 - tand(B(2)-theta)*(x - hit1_x);
 %plot(x,shock2_y);
 
 % shock2_y = hit2_y = tand(theta)*hit2_x = h1 -tand(B(2)-theta)*(hit2_x - hit1_x)
@@ -162,7 +171,7 @@ hit2_x = (height1+tand(B(2)-theta)*hit1_x) / (tand(theta) + tand(B(2)-theta));
 % shock 3 m = sind(B(3))
 % shock 3 point : hit2_x, sind(theta)*hit2_x
 % y - sind(theta)*hit2_x = sind(B(3))*(x-hit2_x)
-shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
+%shock3_y = tand(theta)*hit2_x +tand(B(3))*(x - hit2_x);
 
 %plot(x,shock3_y);
 
@@ -174,7 +183,7 @@ hit3_x = (height1-tand(theta)*hit2_x + tand(B(3))*hit2_x) / ...
 % shock 4 m = -sind(B(4)-theta)
 % shock 4 point : hit3_x, h1
 % y - h1 = -sind(B(4)-theta)*(x-hit3_x)
-shock4_y = height1 - tand(B(4)-theta)*(x-hit3_x);
+%shock4_y = height1 - tand(B(4)-theta)*(x-hit3_x);
 
 %plot(x,shock4_y);
 
@@ -290,7 +299,7 @@ axis equal;
 
 
 A3 = height3*w;
-
+A2 = A3;
 
 
 %% DIFFUSER
@@ -306,39 +315,44 @@ height4 = A4/w; %Diffuser Height
 [~, ~, ~, ~, arearat] = flowisentropic(gamma, M3);
 a_star = A3/arearat;
 
-numPoints = 100;
+
 Aratios = linspace(A3,A4,numPoints) ./ a_star;
 
-%Initialize Variables
-M = zeros(1,numPoints);
-M(1) = M3;
-p = zeros(1,numPoints);
-p(1) = p3;
-T = zeros(1,numPoints);
-T(1) = T3;
-rho = zeros(1,numPoints);
-rho(1) = rho3;
+M4Vec(1) = M3;
+p4Vec(1) = p3;
+T4Vec(1) = T3;
+rho4Vec(1) = rho3;
 
 for i = 2:length(Aratios) 
-    M(i) = fzero(@(M) (1/M)*((2/(gamma+1)) ...
+    M4Vec(i) = fzero(@(M) (1/M)*((2/(gamma+1)) ...
         *(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i), ...
-        0.5);
+        [0.01 1]);
     
-    [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M(i));
-    p(i) = p03*prat;
-    T(i) = T03*Trat;
-    rho(i) = rho03*rhorat;
+    [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M4Vec(i));
+    p4Vec(i) = p03*prat;
+    T4Vec(i) = T03*Trat;
+    rho4Vec(i) = rho03*rhorat;
 end
 
+%% Diffuser Geometry
+figure(4);
+length_diffuser = 3;
+x_endDiffuser = x_endInlet + length_diffuser;
+x = linspace(x_endInlet, x_endDiffuser, numPoints);
+height_diffuser = ((height3 - height4).*x)./(x_endInlet - x_endDiffuser) + (height4*x_endInlet - height3*x_endDiffuser)/(x_endInlet - x_endDiffuser);
+plot(x,height_diffuser);
+title('Diffuser Internal Height');
+xlabel('Length along Engine [m]');
+ylabel('Height of Diffuser [m]');
 %% State 4
-M4 = M(end);
-T4 = T(end);
-p4 = p(end);
-rho4 = rho(end);
+M4 = M4Vec(end);
+T4 = T4Vec(end);
+p4 = p4Vec(end);
+rho4 = rho4Vec(end);
 %T04 = T03;
 %p04 = p03;
-u = sqrt(gamma.*T.*R).*M;
-u4 = u(end);
+u4Vec = sqrt(gamma.*T4Vec.*R).*M4Vec;
+u4 = u4Vec(end);
 a4 = sqrt(gamma*R*T4);
 h4 = cp*T4;
 [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M4);
@@ -354,12 +368,12 @@ length_diffuser = 3;
 x_endDiffuser = x_endInlet + length_diffuser;
 x = linspace(x_endInlet, x_endDiffuser, numPoints);
 xVecByLength = [xVecByLength, x];
-pVecByLength = [pVecByLength, p];
+pVecByLength = [pVecByLength, p4Vec];
 p0VecByLength = [p0VecByLength, p04*ones(1,length(x))];
-TVecByLength = [TVecByLength, T];
+TVecByLength = [TVecByLength, T4Vec];
 T0VecByLength = [T0VecByLength, T04*ones(1,length(x))];
-MVecByLength = [MVecByLength, M];
-uVecByLength = [uVecByLength, u];
+MVecByLength = [MVecByLength, M4Vec];
+uVecByLength = [uVecByLength, u4Vec];
 
 %% Combustor
 disp('Combustor:');
@@ -368,7 +382,7 @@ length_injector = 1;
 length_flameholder = 1;
 %length_combustor = ???
 
-m_dot_fuel = 1; %kg/s CHANGE THIS
+m_dot_fuel = 1; %kg/s
 fRatio = m_dot_fuel / m_dot;
 
 T05 = ((fRatio * q_HV) / cp) + T04;
@@ -398,18 +412,24 @@ Tstar = T4/Trat;   pstar = p4/prat;     rhostar = rho4/rhorat;  p0star = p04/p0r
 T4PP = Trat*Tstar;   p4PP = pstar*prat;   rho4PP = rhorat*rhostar; 
 h4PP = cp*T4PP;
 
-p0VecByLength = linspace(p04, p04PP, numPoints);
-for i = 1:length(p0VecByLength)
+p04PPVec = linspace(p04, p04PP, numPoints);
+for i = 1:length(p04PPVec)
+    [M4PPVec(i), Trat, prat, rhorat, urat, ~, fanno] = flowfanno(gamma, p04PPVec(i)/p0star, 'totalpsub');
+    T4PPVec(i) = Trat*Tstar;   p4PPVec(i) = pstar*prat;   rho4PPVec(i) = rhorat*rhostar; 
+    h4PPVec(i) = cp*T4PPVec(i);
+end
 
 % Vectors for plotting along length
 x_endFlameholder = x_endInjector + length_flameholder;
 x = linspace(x_endInjector, x_endFlameholder, numPoints);
 xVecByLength = [xVecByLength, x];
-pVecByLength = [pVecByLength, p4];
-TVecByLength = [TVecByLength, T4];
+pVecByLength = [pVecByLength, p4PPVec];
+p0VecByLength = [p0VecByLength, p04PPVec];
+TVecByLength = [TVecByLength, T4PPVec];
 T0VecByLength = [T0VecByLength, T04*ones(1,length(x))];
-MVecByLength = [MVecByLength, M4];
-uVecByLength = [uVecByLength, u4];
+MVecByLength = [MVecByLength, M4PPVec];
+u4PPVec = M4PPVec .* sqrt(gamma.*R.*T4PPVec);
+uVecByLength = [uVecByLength, u4PPVec];
 
 % massflow = (rho4P) * A4 * sqrt(gamma*T4P*R)*M4P
 
@@ -418,11 +438,46 @@ uVecByLength = [uVecByLength, u4];
 [~, Trat, prat, rhorat, ~, T0rat, p0rat] = flowrayleigh(gamma, M4PP, 'mach');
 Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = T04/T0rat;   p0star = p04PP/p0rat;
 
+u4PP = sqrt(gamma*T4PP * R) * M4PP;
+
 [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
 T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    %p05 = p0rat*pstar;
 
+T05Vec = linspace(T04, T05, numPoints);
+for i = 1:length(p04PPVec)
+    [M5Vec(i), Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05Vec(i)/T0star, 'totaltsub');
+    T5Vec(i) = Trat*Tstar;   p5Vec(i) = pstar*prat;   rho5Vec(i) = rhorat*rhostar;    %p05Vec(i) = p0rat*pstar;
+    
+    [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M5Vec(i), 'mach');
+    T05Vec(i) = T5Vec(i)/Trat;     p05Vec(i) = p5Vec(i)/prat;   rho05Vec(i) = rho5/rhorat;
+    a5Vec(i) = sqrt(gamma*R*T5Vec(i));
+    u5Vec(i) = M5Vec(i)*a5Vec(i);
+    h5Vec(i) = cp*T5Vec(i);
+end
+u5 = M5*sqrt(gamma*R*T5);
+%Length of combustor calcs:
+pb = p4PP;
+Tb = T4PP;
+
+tb = 325 * 10^(-4)*(pb*9.86*10^(-6))^(-1.6)*exp((-8*10^(-4))*Tb);
+
+uav = .5*(u4PP + u5);
+
+Lb = uav * tb;
 
 
+% Vectors for plotting along length
+
+length_combustor = Lb;
+x_endCombustor = x_endFlameholder + length_combustor;
+x = linspace(x_endFlameholder, x_endCombustor, numPoints);
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p5Vec];
+p0VecByLength = [p0VecByLength, p05Vec];
+TVecByLength = [TVecByLength, T5Vec];
+T0VecByLength = [T0VecByLength, T05Vec];
+MVecByLength = [MVecByLength, M5Vec];
+uVecByLength = [uVecByLength, u5Vec];
 
 
 % is T5 < 1800?
@@ -442,10 +497,6 @@ h5 = cp*T5;
 
 
 
-
-
-
-
 %% Nozzle
 disp('Nozzle:');
 At = (1/arearat)*A5;
@@ -461,6 +512,33 @@ a6 = sqrt(gamma*R*T6);
 u6 = M6*a6;
 h6 = cp*T6;
 
+
+A6Vec = linspace(A5, A6, numPoints);
+for i = 1:length(A6Vec)
+    [M6Vec(i), Trat, prat, rhorat, ~] = flowisentropic(gamma, A6Vec(i)/At, 'sub');
+    T6Vec(i) = T06*Trat;  p6Vec(i) = p06*prat;  rho6Vec(i) = rho06*rhorat;
+    a6Vec(i) = sqrt(gamma*R*T6Vec(i));
+    u6Vec(i) = M6Vec(i)*a6Vec(i);
+    h6Vec(i) = cp*T6Vec(i);
+end
+
+% Vectors for plotting along length
+yDiffConv = (A5/w)/2 - (A6/w)/2;
+angleConv = 32;
+length_nozzle1 = yDiffConv / tand(angleConv);          %% CHANGE
+x_endNozzle1 = x_endCombustor + length_nozzle1;
+x = linspace(x_endCombustor, x_endNozzle1, numPoints);
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p6Vec];
+p0VecByLength = [p0VecByLength, p06*ones(1,length(x))];
+TVecByLength = [TVecByLength, T6Vec];
+T0VecByLength = [T0VecByLength, T06*ones(1,length(x))];
+MVecByLength = [MVecByLength, M6Vec];
+uVecByLength = [uVecByLength, u6Vec];
+
+
+
+
 %% State 7
 p7 = p1;
 T07 = T05;
@@ -472,6 +550,30 @@ A7 = At * arearat;
 a7 = sqrt(gamma*R*T7);
 u7 = M7*a7;
 h7 = cp*T7;
+
+A7Vec = linspace(A6, A7, numPoints);
+for i = 1:length(A7Vec)
+    [M7Vec(i), Trat, prat, rhorat, ~] = flowisentropic(gamma, A7Vec(i)/At, 'sup');
+    T7Vec(i) = T07*Trat;  p7Vec(i) = p07*prat;  rho7Vec(i) = rho07*rhorat;
+    a7Vec(i) = sqrt(gamma*R*T7Vec(i));
+    u7Vec(i) = M7Vec(i)*a7Vec(i);
+    h7Vec(i) = cp*T7Vec(i);
+end
+
+% Vectors for plotting along length
+yDiffDiv = (A7/w)/2 - (A6/w)/2;
+angleDiv = 15;
+length_nozzle2 = yDiffDiv / tand(angleDiv);
+x_endNozzle2 = x_endNozzle1 + length_nozzle2;
+x = linspace(x_endNozzle1, x_endNozzle2, numPoints);
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p7Vec];
+p0VecByLength = [p0VecByLength, p07*ones(1,length(x))];
+TVecByLength = [TVecByLength, T7Vec];
+T0VecByLength = [T0VecByLength, T07*ones(1,length(x))];
+MVecByLength = [MVecByLength, M7Vec];
+uVecByLength = [uVecByLength, u7Vec];
+
 
 Thrust = m_dot * (u7-u1) + (p7 - p1) * A7; 
 g = 9.81;   % m/s^2
@@ -579,4 +681,20 @@ ax.YLim(2) = ax.YLim(2) + yDist/4;
 ax.YLim(1) = 0;
 legend('Process', 'State 1', 'State 3', 'State 4', 'State 4''''', ...
     'State 5', 'State 6', 'State 7', 'location', 'northwest');
+
+
+%% Table of All Parameters
+State = {'1','2','3','4','5','6','7'}';
+Pressure_kPa = [p1 p2 p3 p4 p5 p6 p7]' .* 1E-3;
+Temperature_K = [T1 T2 T3 T4 T5 T6 T7]';
+StagnationPressure_kPa = [p01 p02 p03 p04 p05 p06 p07]' .* 1E-3;
+StagnationTemperature_K = [T01 T02 T03 T04 T05 T06 T07]';
+Density_kg_m3 = [rho1 rho2 rho3 rho4 rho5 rho6 rho7]';
+FlowSpeed = [u1 u2 u3 u4 u5 u6 u7]';
+Mach = [M1 M2 M3 M4 M5 M6 M7]';
+Area = [M1 M2 M3 M4 M5 M6 M7]';
+
+T = table(State, Pressure_kPa, Temperature_K, StagnationPressure_kPa, ...
+    StagnationTemperature_K, Density_kg_m3, FlowSpeed, Mach);
+disp(T);
 

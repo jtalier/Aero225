@@ -10,6 +10,7 @@ format short g;
 %% Inputs
 M1      = 3.00;         % unitless             Mach #
 height  = 30E3;         % m                    Cruise Altitude
+numPoints = 20;
 % Fuel Type: Hydrogen
 q_HV    = 120E6;        % J/kg                 Heating Value
 MW      = 28.9;         % g/mol                Molecular Weight
@@ -120,6 +121,15 @@ for i = 1:numShocks
     u(i+1) = sqrt(gamma*R*T(i+1)) * M(i+1);
 end
 
+T2 = T(end);
+p2 = p(end);
+M2 = M(end);
+rho2 = rho(end);
+a2 = sqrt(gamma*R*T2);
+u2 = M2*a2;
+h2 = cp*T2;
+[~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M2);
+T02 = T2/Trat;     p02 = p2/prat;   rho02 = rho2/rhorat;
 
 %p0(end)/p0(1)
 
@@ -289,7 +299,7 @@ axis equal;
 
 
 A3 = height3*w;
-
+A2 = A3;
 
 
 %% DIFFUSER
@@ -305,7 +315,7 @@ height4 = A4/w; %Diffuser Height
 [~, ~, ~, ~, arearat] = flowisentropic(gamma, M3);
 a_star = A3/arearat;
 
-numPoints = 100;
+
 Aratios = linspace(A3,A4,numPoints) ./ a_star;
 
 M4Vec(1) = M3;
@@ -372,7 +382,7 @@ length_injector = 1;
 length_flameholder = 1;
 %length_combustor = ???
 
-m_dot_fuel = 1; %kg/s CHANGE THIS
+m_dot_fuel = 1; %kg/s
 fRatio = m_dot_fuel / m_dot;
 
 T05 = ((fRatio * q_HV) / cp) + T04;
@@ -444,26 +454,7 @@ for i = 1:length(p04PPVec)
     u5Vec(i) = M5Vec(i)*a5Vec(i);
     h5Vec(i) = cp*T5Vec(i);
 end
-
-% Vectors for plotting along length
-length_combustor = 13;          %% CHANGE
-x_endCombustor = x_endFlameholder + length_combustor;
-x = linspace(x_endFlameholder, x_endCombustor, numPoints);
-xVecByLength = [xVecByLength, x];
-pVecByLength = [pVecByLength, p5Vec];
-p0VecByLength = [p0VecByLength, p05Vec];
-TVecByLength = [TVecByLength, T5Vec];
-T0VecByLength = [T0VecByLength, T05Vec];
-MVecByLength = [MVecByLength, M5Vec];
-uVecByLength = [uVecByLength, u5Vec];
 u5 = M5*sqrt(gamma*R*T5);
-
-% is T5 < 1800?
-
-%Mass is conserved
-A5 = A4;
-%massflow = rho5*M5*sqrt(gamma*R*T5)*A5
-
 %Length of combustor calcs:
 pb = p4PP;
 Tb = T4PP;
@@ -473,6 +464,28 @@ tb = 325 * 10^(-4)*(pb*9.86*10^(-6))^(-1.6)*exp((-8*10^(-4))*Tb);
 uav = .5*(u4PP + u5);
 
 Lb = uav * tb;
+
+
+% Vectors for plotting along length
+
+length_combustor = Lb;
+x_endCombustor = x_endFlameholder + length_combustor;
+x = linspace(x_endFlameholder, x_endCombustor, numPoints);
+xVecByLength = [xVecByLength, x];
+pVecByLength = [pVecByLength, p5Vec];
+p0VecByLength = [p0VecByLength, p05Vec];
+TVecByLength = [TVecByLength, T5Vec];
+T0VecByLength = [T0VecByLength, T05Vec];
+MVecByLength = [MVecByLength, M5Vec];
+uVecByLength = [uVecByLength, u5Vec];
+
+
+% is T5 < 1800?
+
+%Mass is conserved
+A5 = A4;
+%massflow = rho5*M5*sqrt(gamma*R*T5)*A5
+
 
 %% State 5
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5, 'mach');
@@ -510,7 +523,9 @@ for i = 1:length(A6Vec)
 end
 
 % Vectors for plotting along length
-length_nozzle1 = 13;          %% CHANGE
+yDiffConv = (A5/w)/2 - (A6/w)/2;
+angleConv = 32;
+length_nozzle1 = yDiffConv / tand(angleConv);          %% CHANGE
 x_endNozzle1 = x_endCombustor + length_nozzle1;
 x = linspace(x_endCombustor, x_endNozzle1, numPoints);
 xVecByLength = [xVecByLength, x];
@@ -546,7 +561,9 @@ for i = 1:length(A7Vec)
 end
 
 % Vectors for plotting along length
-length_nozzle2 = 13;          %% CHANGE
+yDiffDiv = (A7/w)/2 - (A6/w)/2;
+angleDiv = 15;
+length_nozzle2 = yDiffDiv / tand(angleDiv);
 x_endNozzle2 = x_endNozzle1 + length_nozzle2;
 x = linspace(x_endNozzle1, x_endNozzle2, numPoints);
 xVecByLength = [xVecByLength, x];
@@ -664,4 +681,20 @@ ax.YLim(2) = ax.YLim(2) + yDist/4;
 ax.YLim(1) = 0;
 legend('Process', 'State 1', 'State 3', 'State 4', 'State 4''''', ...
     'State 5', 'State 6', 'State 7', 'location', 'northwest');
+
+
+%% Table of All Parameters
+State = {'1','2','3','4','5','6','7'}';
+Pressure_kPa = [p1 p2 p3 p4 p5 p6 p7]' .* 1E-3;
+Temperature_K = [T1 T2 T3 T4 T5 T6 T7]';
+StagnationPressure_kPa = [p01 p02 p03 p04 p05 p06 p07]' .* 1E-3;
+StagnationTemperature_K = [T01 T02 T03 T04 T05 T06 T07]';
+Density_kg_m3 = [rho1 rho2 rho3 rho4 rho5 rho6 rho7]';
+FlowSpeed_m_s = [u1 u2 u3 u4 u5 u6 u7]';
+Mach = [M1 M2 M3 M4 M5 M6 M7]';
+Area_m2 = [A1 A2 A3 A4 A5 A6 A7]';
+
+T = table(State, Pressure_kPa, Temperature_K, StagnationPressure_kPa, ...
+    StagnationTemperature_K, Density_kg_m3, FlowSpeed_m_s, Mach, Area_m2);
+disp(T);
 
