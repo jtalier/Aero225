@@ -424,6 +424,8 @@ uVecByLength = [uVecByLength, u4PPVec];
 [~, Trat, prat, rhorat, ~, T0rat, p0rat] = flowrayleigh(gamma, M4PP, 'mach');
 Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = T04/T0rat;   p0star = p04PP/p0rat;
 
+u4PP = sqrt(gamma*T4PP * R) * M4PP;
+
 [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
 T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    %p05 = p0rat*pstar;
 
@@ -450,6 +452,7 @@ TVecByLength = [TVecByLength, T5Vec];
 T0VecByLength = [T0VecByLength, T05Vec];
 MVecByLength = [MVecByLength, M5Vec];
 uVecByLength = [uVecByLength, u5Vec];
+u5 = M5*sqrt(gamma*R*T5);
 
 % is T5 < 1800?
 
@@ -457,6 +460,15 @@ uVecByLength = [uVecByLength, u5Vec];
 A5 = A4;
 %massflow = rho5*M5*sqrt(gamma*R*T5)*A5
 
+%Length of combustor calcs:
+pb = p4PP;
+Tb = T4PP;
+
+tb = 325 * 10^(-4)*(pb*9.86*10^(-6))^(-1.6)*exp((-8*10^(-4))*Tb);
+
+uav = .5*(u4PP + u5);
+
+Lb = uav * tb;
 
 %% State 5
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M5, 'mach');
