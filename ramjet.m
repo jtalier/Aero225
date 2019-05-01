@@ -47,9 +47,9 @@ a1 = sqrt(gamma*R*T1);
 [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M1);
 T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
 u1 = M1*a1;
-%A1 = m_dot / rho1 / u1;
+A1 = m_dot / rho1 / u1;
 h1 = cp*T1;
-A1 = 6.1250;
+
 height1 = A1 / w;
 
 
