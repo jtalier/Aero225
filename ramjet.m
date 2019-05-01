@@ -291,7 +291,7 @@ v2 = [0, 0;
     hit1_x, height1 + 0.2];
 f2 = [1 2 3 4; 
     5 6 7 8];
-patch('Faces',f2,'Vertices',v2,'FaceColor','black')
+patch('Faces',f2,'Vertices',v2,'FaceColor','black');
 
 axis([0 hit4_x + length_straight 0 4]);
 axis equal;
@@ -339,11 +339,31 @@ figure(4);
 length_diffuser = 3;
 x_endDiffuser = x_endInlet + length_diffuser;
 x = linspace(x_endInlet, x_endDiffuser, numPoints);
-height_diffuser = ((height3 - height4).*x)./(x_endInlet - x_endDiffuser) + (height4*x_endInlet - height3*x_endDiffuser)/(x_endInlet - x_endDiffuser);
-plot(x,height_diffuser);
-title('Diffuser Internal Height');
+height_diffuser = height1 - (((height3 - height4).*x)./(x_endInlet - x_endDiffuser) + (height4*x_endInlet - height3*x_endDiffuser)/(x_endInlet - x_endDiffuser));
+
+hold on;
+plot(x,height1*ones(1,length(x)),'k'); %Upper Wall
+plot(x,height_diffuser,'k'); %Lower Wall
+
+% Shading in walls
+v2 = [x_endInlet - length_straight, height1 - height3; 
+    x_endInlet, height1 - height3;
+    x_endDiffuser ,  height1 - height4;
+    x_endDiffuser ,  0;
+    x_endInlet - length_straight, 0;
+    x_endInlet - length_straight, height1
+    x_endDiffuser, height1
+    x_endDiffuser, height1 + 0.2
+    x_endInlet - length_straight, height1 + 0.2];
+f2 = [1 2 3 4 5; 
+    6 7 8 9 9];
+patch('Faces',f2,'Vertices',v2,'FaceColor','black')
+
+axis([x_endInlet - length_straight x_endDiffuser 0 4]);
+title('Diffuser Geometry');
 xlabel('Length along Engine [m]');
 ylabel('Height of Diffuser [m]');
+hold off;
 %% State 4
 M4 = M4Vec(end);
 T4 = T4Vec(end);
