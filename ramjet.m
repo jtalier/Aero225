@@ -424,13 +424,13 @@ p04PP = p04PP_p04 * p04;
 [~, Trat, prat, rhorat, ~, p0rat, ~] = flowfanno(gamma, M4, 'mach');
 Tstar = T4/Trat;   pstar = p4/prat;     rhostar = rho4/rhorat;  p0star = p04/p0rat;
 
-[M4PP, Trat, prat, rhorat, urat, ~, fanno] = flowfanno(gamma, p04PP/p0star, 'totalpsub');
+[M4PP, Trat, prat, rhorat, urat, ~, ~] = flowfanno(gamma, p04PP/p0star, 'totalpsub');
 T4PP = Trat*Tstar;   p4PP = pstar*prat;   rho4PP = rhorat*rhostar; 
 h4PP = cp*T4PP;
 
 p04PPVec = linspace(p04, p04PP, numPoints);
 for i = 1:length(p04PPVec)
-    [M4PPVec(i), Trat, prat, rhorat, urat, ~, fanno] = flowfanno(gamma, p04PPVec(i)/p0star, 'totalpsub');
+    [M4PPVec(i), Trat, prat, rhorat, urat, ~, ~] = flowfanno(gamma, p04PPVec(i)/p0star, 'totalpsub');
     T4PPVec(i) = Trat*Tstar;   p4PPVec(i) = pstar*prat;   rho4PPVec(i) = rhorat*rhostar; 
     h4PPVec(i) = cp*T4PPVec(i);
 end
