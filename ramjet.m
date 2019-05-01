@@ -295,7 +295,7 @@ A3 = height3*w;
 
 
 %% DIFFUSER
-disp('Diffusor:');
+disp('diffuser:');
 %A3 = A3; %Starting area of diffuser
 height3 = A3/w; %Starting Diffuser Height
 A4 = 6; %End area of diffuser
@@ -306,8 +306,6 @@ height4 = A4/w; %Diffuser Height
 a_star = A3/arearat;
 
 numPoints = 100;
-%L_diff = 0.5; %[meters] %Length of diffuser
-%L = linspace(0,L_diff,100);
 Aratios = linspace(A3,A4,numPoints) ./ a_star;
 
 %Initialize Variables
@@ -351,9 +349,9 @@ T04 = T4/Trat;     p04 = p4/prat;   rho04 = rho4/rhorat;
 
 
 % Vectors for plotting along length
-length_diffusor = 3;
-x_endDiffusor = x_endInlet + length_diffusor;
-x = linspace(x_endInlet, x_endDiffusor, numPoints);
+length_diffuser = 3;
+x_enddiffuser = x_endInlet + length_diffuser;
+x = linspace(x_endInlet, x_enddiffuser, numPoints);
 xVecByLength = [xVecByLength, x];
 pVecByLength = [pVecByLength, p];
 p0VecByLength = [p0VecByLength, p04*ones(1,length(x))];
@@ -434,10 +432,24 @@ p05
 
 
 
+%% Nozzle
 
+Me = sqrt((2/(gamma - 1))*((p5/p1).^((gamma-1)/gamma) - 1)); %exit Mach (p5 - chamber pressure)
 
+At = (1/arearat)*A5;
+%throat area
 
+Ae = (At/Me)*((1+((gamma - 1)/2)*(Me.^2))/((gamma + 1)/2)).^((gamma + 1)/(2*(gamma - 1)));%exit area
+%exit area
 
+%total pressure and temperature
+pe = p05 * (1 + ((gamma - 1)/2)*(Me.^2)).^(-gamma/(gamma - 1));
+
+Te = T05 * ((1 + ((gamma - 1)/2)*(Me.^2)).^(-1));
+
+Ve = Me * sqrt(gamma*R*Te);
+
+F = m_dot * Ve + (pe - p1) * Ae; %thrust
 
 
 
