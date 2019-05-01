@@ -42,7 +42,6 @@ w = 2;  % m, design value, width / depth into page
 
 %% Initial State
 [T1, a1, p1, rho1] = atmoscoesa(height);
-%p1
 a1 = sqrt(gamma*R*T1);
 [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M1);
 T01 = T1/Trat;     p01 = p1/prat;   rho01 = rho1/rhorat;
@@ -125,14 +124,14 @@ end
 %p0(end)/p0(1)
 
 
-[mach, Trat, prat, rhorat, downstream_mach, p0rat] = ...
+[mach, Trat, prat, rhorat, downstream_mach, ~] = ...
     flownormalshock(gamma, M(end));
 
 %% State 3
 M3 = downstream_mach;
 T3 = Trat*T(end);  p3 = prat*p(end);   rho3 = rhorat*rho(end);
 
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
+[~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M3);
 T03 = T3/Trat;     p03 = p3/prat;   rho03 = rho3/rhorat;
 a3 = sqrt(gamma*R*T3);
 u3 = M3*a3;
@@ -175,7 +174,7 @@ hit3_x = (height1-tand(theta)*hit2_x + tand(B(3))*hit2_x) / ...
 % shock 4 m = -sind(B(4)-theta)
 % shock 4 point : hit3_x, h1
 % y - h1 = -sind(B(4)-theta)*(x-hit3_x)
-shock4_y = height1 -tand(B(4)-theta)*(x-hit3_x);
+shock4_y = height1 - tand(B(4)-theta)*(x-hit3_x);
 
 %plot(x,shock4_y);
 
@@ -295,14 +294,16 @@ A3 = height3*w;
 
 
 %% DIFFUSER
-disp('diffuser:');
+disp('Diffuser:');
 %A3 = A3; %Starting area of diffuser
 height3 = A3/w; %Starting Diffuser Height
 A4 = 6; %End area of diffuser
 height4 = A4/w; %Diffuser Height
 
+%Diffuser Length = 3 m
+
 %Find A*
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M3);
+[~, ~, ~, ~, arearat] = flowisentropic(gamma, M3);
 a_star = A3/arearat;
 
 numPoints = 100;
@@ -323,7 +324,7 @@ for i = 2:length(Aratios)
         *(1+ ((gamma-1)/2) * M^2))^((gamma+1)/(2*(gamma-1))) - Aratios(i), ...
         0.5);
     
-    [Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M(i));
+    [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M(i));
     p(i) = p03*prat;
     T(i) = T03*Trat;
     rho(i) = rho03*rhorat;
@@ -334,13 +335,13 @@ M4 = M(end);
 T4 = T(end);
 p4 = p(end);
 rho4 = rho(end);
-T04 = T03;
-p04 = p03;
+%T04 = T03;
+%p04 = p03;
 u = sqrt(gamma.*T.*R).*M;
 u4 = u(end);
 a4 = sqrt(gamma*R*T4);
 h4 = cp*T4;
-[Mrat, Trat, prat, rhorat, arearat] = flowisentropic(gamma, M4);
+[~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M4);
 T04 = T4/Trat;     p04 = p4/prat;   rho04 = rho4/rhorat;
 
 %massflow = rho(1)*A3*sqrt(gamma*T(1)*R)*M(1)
@@ -368,8 +369,12 @@ length_flameholder = 1;
 %length_combustor = ???
 
 
-mDotFuel = 1; %Kg/s CHANGE THIS
-fRatio = mDotFuel / m_dot;
+
+
+%% Dan's go at a combustor
+
+m_dot_fuel = 1; %kg/s CHANGE THIS
+fRatio = m_dot_fuel / m_dot;
 
 T05 = ((fRatio * q_HV) / cp) + T04;
 
@@ -394,7 +399,7 @@ Tstar = T4PP/Trat;   pstar = p4PP/prat;     rhostar = rho4PP/rhorat;   T0star = 
 u4PP = sqrt(gamma*T4PP * R) * M4PP;
 
 [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
-T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    p05 = p0rat*pstar;
+T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    %p05 = p0rat*pstar;
 
 u5 = M5*sqrt(gamma*R*T5);
 
@@ -421,10 +426,6 @@ a5 = sqrt(gamma*R*T5);
 u5 = M5*a5;
 h5 = cp*T5;
 
-u5
-%p5
-p05
-
 
 
 
@@ -433,26 +434,40 @@ p05
 
 
 %% Nozzle
-
-Me = sqrt((2/(gamma - 1))*((p5/p1).^((gamma-1)/gamma) - 1)); %exit Mach (p5 - chamber pressure)
-
+disp('Nozzle:');
 At = (1/arearat)*A5;
-%throat area
 
-Ae = (At/Me)*((1+((gamma - 1)/2)*(Me.^2))/((gamma + 1)/2)).^((gamma + 1)/(2*(gamma - 1)));%exit area
-%exit area
+%% State 6
+A6 = At;
+T06 = T05;
+p06 = p05;
+rho06 = rho05;
+[M6, Trat, prat, rhorat, ~] = flowisentropic(gamma, 1, 'Mach');
+T6 = T06*Trat;  p6 = p06*prat;  rho6 = rho06*rhorat;
+a6 = sqrt(gamma*R*T6);
+u6 = M6*a6;
+h6 = cp*T6;
 
-%total pressure and temperature
-pe = p05 * (1 + ((gamma - 1)/2)*(Me.^2)).^(-gamma/(gamma - 1));
+%% State 7
+p7 = p1;
+T07 = T05;
+p07 = p05;
+rho07 = rho05;
+[M7, Trat, prat, rhorat, arearat] = flowisentropic(gamma, p7/p05, 'pres');
+T7 = T07*Trat;  p7 = p07*prat;  rho7 = rho07*rhorat;
+A7 = At * arearat;
+a7 = sqrt(gamma*R*T7);
+u7 = M7*a7;
+h7 = cp*T7;
 
-Te = T05 * ((1 + ((gamma - 1)/2)*(Me.^2)).^(-1));
+Thrust = m_dot * u7 + (p7 - p1) * A7; 
+g = 9.81;   % m/s^2
+I_sp = Thrust / (m_dot_fuel*g);
 
-Ve = Me * sqrt(gamma*R*Te);
-
-F = m_dot * Ve + (pe - p1) * Ae; %thrust
-
-
-
+disp('Thrust [kN]');
+disp(Thrust * 1E-3);
+disp('Specific Impulse [s]');
+disp(I_sp);
 
 
 
