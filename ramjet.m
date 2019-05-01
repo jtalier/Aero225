@@ -328,6 +328,16 @@ for i = 2:length(Aratios)
     rho(i) = rho03*rhorat;
 end
 
+%% Diffuser Geometry
+figure(4);
+length_diffuser = 3;
+x_endDiffuser = x_endInlet + length_diffuser;
+x = linspace(x_endInlet, x_endDiffuser, numPoints);
+height_diffuser = ((height3 - height4).*x)./(x_endInlet - x_endDiffuser) + (height4*x_endInlet - height3*x_endDiffuser)/(x_endInlet - x_endDiffuser);
+plot(x,height_diffuser);
+title('Diffuser Internal Height');
+xlabel('Length along Engine [m]');
+ylabel('Height of Diffuser [m]');
 %% State 4
 M4 = M(end);
 T4 = T(end);
