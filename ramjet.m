@@ -140,12 +140,28 @@ T02 = T2/Trat;     p02 = p2/prat;   rho02 = rho2/rhorat;
 M3 = downstream_mach;
 T3 = Trat*T(end);  p3 = prat*p(end);   rho3 = rhorat*rho(end);
 
+
 [~, Trat, prat, rhorat, ~] = flowisentropic(gamma, M3);
 T03 = T3/Trat;     p03 = p3/prat;   rho03 = rho3/rhorat;
 a3 = sqrt(gamma*R*T3);
 u3 = M3*a3;
 h3 = cp*T3;
 
+
+% Table of Inlet Parameters
+State = {'Ambient', 'After OS 1','After OS 2','After OS 3','After OS 4', ...
+    'After NS'}';
+Pressure_kPa = [p p3]' .* 1E-3;
+Temperature_K = [T T3]';
+StagnationPressure_kPa = [p0 p03]' .* 1E-3;
+StagnationTemperature_K = [T0 T03]';
+Density_kg_m3 = [rho rho3]';
+FlowSpeed_m_s = [u u3]';
+Mach = [M M3]';
+
+Tinlet = table(State, Pressure_kPa, Temperature_K, StagnationPressure_kPa, ...
+    StagnationTemperature_K, Density_kg_m3, FlowSpeed_m_s, Mach);
+disp(Tinlet);
 %p03/p01
 
 
@@ -428,13 +444,13 @@ p04PP = p04PP_p04 * p04;
 [~, Trat, prat, rhorat, ~, p0rat, ~] = flowfanno(gamma, M4, 'mach');
 Tstar = T4/Trat;   pstar = p4/prat;     rhostar = rho4/rhorat;  p0star = p04/p0rat;
 
-[M4PP, Trat, prat, rhorat, urat, ~, fanno] = flowfanno(gamma, p04PP/p0star, 'totalpsub');
+[M4PP, Trat, prat, rhorat, urat, ~, ~] = flowfanno(gamma, p04PP/p0star, 'totalpsub');
 T4PP = Trat*Tstar;   p4PP = pstar*prat;   rho4PP = rhorat*rhostar; 
 h4PP = cp*T4PP;
 
 p04PPVec = linspace(p04, p04PP, numPoints);
 for i = 1:length(p04PPVec)
-    [M4PPVec(i), Trat, prat, rhorat, urat, ~, fanno] = flowfanno(gamma, p04PPVec(i)/p0star, 'totalpsub');
+    [M4PPVec(i), Trat, prat, rhorat, urat, ~, ~] = flowfanno(gamma, p04PPVec(i)/p0star, 'totalpsub');
     T4PPVec(i) = Trat*Tstar;   p4PPVec(i) = pstar*prat;   rho4PPVec(i) = rhorat*rhostar; 
     h4PPVec(i) = cp*T4PPVec(i);
 end
@@ -599,12 +615,17 @@ Thrust = m_dot * (u7-u1) + (p7 - p1) * A7;
 g = 9.81;   % m/s^2
 I_sp = Thrust / (m_dot_fuel*g);
 
+length_total = hit4_x + length_straight + length_diffuser + length_flameholder ...
+    + length_injector + length_combustor + length_nozzle1 + length_nozzle2 - hit1_x;
+
 disp('Combustor Temperature [K]');
 disp(T5);
 disp('Thrust [kN]');
 disp(Thrust * 1E-3);
 disp('Specific Impulse [s]');
 disp(I_sp);
+disp('Total Length [m]');
+disp(length_total);
 
 
 
@@ -683,6 +704,7 @@ ylabel('Enthalpy normalized by initial state [unitless]');
 grid on;
 
 % Adding states
+plot((gamma/(gamma-1)).*log(T2/T1) - log(p2/p1), h2/h1, 'o');
 plot((gamma/(gamma-1)).*log(T3/T1) - log(p3/p1), h3/h1, 'o');
 plot((gamma/(gamma-1)).*log(T4/T1) - log(p4/p1), h4/h1, 'o');
 plot((gamma/(gamma-1)).*log(T4PP/T1) - log(p4PP/p1), h4PP/h1, 'o');
@@ -699,8 +721,9 @@ yDist = ax.YLim(2) - ax.YLim(1);
 ax.YLim(1) = ax.YLim(1) - yDist/4;
 ax.YLim(2) = ax.YLim(2) + yDist/4;
 ax.YLim(1) = 0;
-legend('Process', 'State 1', 'State 3', 'State 4', 'State 4''''', ...
-    'State 5', 'State 6', 'State 7', 'location', 'northwest');
+legend('Process', 'State 1', 'State 2', 'State 3', 'State 4', ...
+    'State 4''''', 'State 5', 'State 6', 'State 7', ...
+    'location', 'northwest');
 
 
 %% Table of All Parameters
@@ -714,7 +737,7 @@ FlowSpeed_m_s = [u1 u2 u3 u4 u5 u6 u7]';
 Mach = [M1 M2 M3 M4 M5 M6 M7]';
 Area_m2 = [A1 A2 A3 A4 A5 A6 A7]';
 
-T = table(State, Pressure_kPa, Temperature_K, StagnationPressure_kPa, ...
+Tall = table(State, Pressure_kPa, Temperature_K, StagnationPressure_kPa, ...
     StagnationTemperature_K, Density_kg_m3, FlowSpeed_m_s, Mach, Area_m2);
-disp(T);
+disp(Tall);
 
