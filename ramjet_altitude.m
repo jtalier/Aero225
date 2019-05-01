@@ -14,6 +14,7 @@ numAltitudes = 100;     % m
 
 Thrust_ALTITUDE = zeros(1,numAltitudes);
 I_sp_ALTITUDE = zeros(1,numAltitudes);
+T5_ALTITUDE = zeros(1,numAltitudes);
 HEIGHTS = linspace(min_height,design_height,numAltitudes);
 
 for index = 1:numAltitudes
@@ -442,7 +443,9 @@ for index = 1:numAltitudes
 
     [M5, Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05/T0star, 'totaltsub');
     T5 = Trat*Tstar;   p5 = pstar*prat;   rho5 = rhorat*rhostar;    %p05 = p0rat*pstar;
-
+    
+    T5_ALTITUDE(index) = T5;
+    
     T05Vec = linspace(T04, T05, numPoints);
     for i = 1:length(p04PPVec)
         [M5Vec(i), Trat, prat, rhorat, ~, ~, p0rat] = flowrayleigh(gamma, T05Vec(i)/T0star, 'totaltsub');
@@ -683,3 +686,14 @@ grid on;
 title('Specific Impulse Altitude Performance');
 xlabel('Altitude [km]');
 ylabel('I_s_p [s]');
+
+figure(3);
+T5_max = T5_max .* ones(1,numAltitudes);
+hold on;
+plot(HEIGHTS * 1E-3,T5_ALTITUDE);
+plot(HEIGHTS * 1E-3,T5_max,'--r');
+grid on;
+hold off;
+title('Combustion Chamber Temperature over Altitude');
+xlabel('Altitude [km]');
+ylabel('Combustion Chamber Temperature [K]');
