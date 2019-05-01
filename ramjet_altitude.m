@@ -9,7 +9,7 @@ format short g;
 
 %% Altitude Sweep
 design_height  = 50E3;         % m        Cruise Altitude
-min_height = 0E3;             % m
+min_height = 0E3;              % m
 numAltitudes = 100;     % m
 
 Thrust_ALTITUDE = zeros(1,numAltitudes);
